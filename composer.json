@@ -1,9 +1,13 @@
 {
-    "name": "hootlex/laravel-friendships",
+    "name": "arubacao/laravel-friendships",
     "description": "This package gives Eloqent models the ability to manage their friendships.",
-    "keywords": ["laravel", "friendships", "friend-system", "friends", "eloqent"],
+    "keywords": ["laravel", "Lumen", "friend-system", "friendships", "friends", "relationships", "eloquent"],
     "license": "MIT",
     "authors": [
+        {
+            "name": "arubacao",
+            "email": "arubacao@gmail.com"
+        },
         {
             "name": "Hootlex",
             "email": "hootlex@icloud.com"
@@ -27,7 +31,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Hootlex\\Friendships\\": "src/"
+            "Arubacao\\Friendships\\": "src/"
         }
     },
     "minimum-stability": "stable"

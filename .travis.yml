@@ -2,6 +2,7 @@ language: php
 
 php:
   - 5.6
+  - 7
   - hhvm
 
 sudo: required
@@ -12,7 +13,7 @@ before_install:
 
 
 script:
-- cp src/database/migrations/create_friendships_table.php vendor/laravel/laravel/database/migrations/2015_11_19_053825_create_friendships_table.php
+- cp src/database/migrations/create_friendships_table.php vendor/laravel/laravel/database/migrations/2016_05_13_000000_create_friendships_table.php
 - touch vendor/laravel/laravel/database/database.sqlite
 - yes | cp tests/Stub_User.php vendor/laravel/laravel/app/User.php
 - cd vendor/laravel/laravel

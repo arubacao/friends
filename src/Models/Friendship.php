@@ -1,8 +1,8 @@
 <?php
 
-namespace Hootlex\Friendships\Models;
+namespace Arubacao\Friendships\Models;
 
-use Hootlex\Friendships\Status;
+use Arubacao\Friendships\Status;
 use Illuminate\Database\Eloquent\Model;
 
 class Friendship extends Model

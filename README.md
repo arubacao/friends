@@ -1,4 +1,4 @@
-# Laravel 5 Friendships [![Build Status](https://travis-ci.org/hootlex/laravel-friendships.svg?branch=v1.0.15)](https://travis-ci.org/hootlex/laravel-friendships) [![Version](https://img.shields.io/packagist/v/hootlex/laravel-friendships.svg?style=flat)](https://packagist.org/packages/hootlex/laravel-friendships)  [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE)
+# Laravel 5 Friendships [![Build Status](https://travis-ci.org/arubacao/laravel-friendships.svg?branch=v1.0.15)](https://travis-ci.org/arubacao/laravel-friendships) [![Version](https://img.shields.io/packagist/v/arubacao/laravel-friendships.svg?style=flat)](https://packagist.org/packages/arubacao/laravel-friendships)  [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE)
 
 
 This package gives Eloqent models the ability to manage their friendships.
@@ -15,7 +15,7 @@ You can easily design a Facebook like Friend System.
 First, install the package through Composer.
 
 ```php
-composer require hootlex/laravel-friendships
+composer require arubacao/laravel-friendships
 ```
 
 Then include the service provider inside `config/app.php`.
@@ -23,18 +23,18 @@ Then include the service provider inside `config/app.php`.
 ```php
 'providers' => [
     ...
-    Hootlex\Friendships\FriendshipsServiceProvider::class,
+    Arubacao\Friendships\FriendshipsServiceProvider::class,
     ...
 ];
 ```
 Lastly you need to publish the migration and migrate the database
 
 ```
-php artisan vendor:publish --provider="Hootlex\Friendships\FriendshipsServiceProvider" && php artisan migrate
+php artisan vendor:publish --provider="Arubacao\Friendships\FriendshipsServiceProvider" && php artisan migrate
 ```
 ## Setup a Model
 ```php
-use Hootlex\Friendships\Traits\Friendable;
+use Arubacao\Friendships\Traits\Friendable;
 class User extends Model
 {
     use Friendable;
@@ -43,7 +43,7 @@ class User extends Model
 ```
 
 ## How to use 
-[Check the Test file to see the package in action](https://github.com/hootlex/laravel-friendships/blob/master/tests/FriendshipsTest.php)
+[Check the Test file to see the package in action](https://github.com/arubacao/laravel-friendships/blob/master/tests/FriendshipsTest.php)
 
 #### Send a Friend Request
 ```php

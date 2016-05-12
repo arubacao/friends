@@ -1,9 +1,9 @@
 <?php
 
-namespace Hootlex\Friendships\Traits;
+namespace Arubacao\Friendships\Traits;
 
-use Hootlex\Friendships\Models\Friendship;
-use Hootlex\Friendships\Status;
+use Arubacao\Friendships\Models\Friendship;
+use Arubacao\Friendships\Status;
 use Illuminate\Database\Eloquent\Model;
 
 trait Friendable
@@ -11,7 +11,7 @@ trait Friendable
     /**
      * @param Model $recipient
      *
-     * @return \Hootlex\Friendships\Models\Friendship|false
+     * @return \Arubacao\Friendships\Models\Friendship|false
      */
     public function befriend(Model $recipient)
     {
@@ -87,7 +87,7 @@ trait Friendable
     /**
      * @param Model $recipient
      *
-     * @return \Hootlex\Friendships\Models\Friendship
+     * @return \Arubacao\Friendships\Models\Friendship
      */
     public function blockFriend(Model $recipient)
     {
@@ -115,7 +115,7 @@ trait Friendable
     /**
      * @param Model $recipient
      *
-     * @return \Hootlex\Friendships\Models\Friendship
+     * @return \Arubacao\Friendships\Models\Friendship
      */
     public function getFriendship(Model $recipient)
     {
