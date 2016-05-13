@@ -34,6 +34,7 @@ class Friendship extends Model
 
     /**
      * @param Model $recipient
+     *
      * @return $this
      */
     public function fillRecipient($recipient)
@@ -47,6 +48,7 @@ class Friendship extends Model
     /**
      * @param $query
      * @param Model $model
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWhereRecipient($query, $model)
@@ -58,6 +60,7 @@ class Friendship extends Model
     /**
      * @param $query
      * @param Model $model
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeWhereSender($query, $model)
@@ -70,6 +73,7 @@ class Friendship extends Model
      * @param $query
      * @param Model $sender
      * @param Model $recipient
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeBetweenModels($query, $sender, $recipient)
