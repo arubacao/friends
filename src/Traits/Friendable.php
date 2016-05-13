@@ -269,10 +269,10 @@ trait Friendable
     private function findFriendships($status = '%')
     {
         return Friendship::where('status', 'LIKE', $status)
-            ->where(function ($query) {
-                $query->where(function ($q) {
+            ->where(function($query) {
+                $query->where(function($q) {
                     $q->whereSender($this);
-                })->orWhere(function ($q) {
+                })->orWhere(function($q) {
                     $q->whereRecipient($this);
                 });
             });
@@ -306,13 +306,13 @@ trait Friendable
         $friendIds = array_unique(array_merge($recipients, $senders));
 
         $fofs = Friendship::where('status', Status::ACCEPTED)
-                          ->where(function ($query) use ($friendIds) {
-                              $query->where(function ($q) use ($friendIds) {
-                                  $q->whereIn('sender_id', $friendIds);
-                              })->orWhere(function ($q) use ($friendIds) {
-                                  $q->whereIn('recipient_id', $friendIds);
-                              });
-                          })->get(['sender_id', 'recipient_id']);
+                            ->where(function ($query) use ($friendIds) {
+                                $query->where(function ($q) use ($friendIds) {
+                                    $q->whereIn('sender_id', $friendIds);
+                                })->orWhere(function ($q) use ($friendIds) {
+                                    $q->whereIn('recipient_id', $friendIds);
+                                });
+                            })->get(['sender_id', 'recipient_id']);
 
         $fofIds = array_unique(
             array_merge($fofs->pluck('sender_id')->all(), $fofs->lists('recipient_id')->all())
