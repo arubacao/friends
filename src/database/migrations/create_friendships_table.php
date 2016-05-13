@@ -7,7 +7,7 @@ class CreateFriendshipsTable extends Migration
 {
     public function up()
     {
-        Schema::create('friendships', function(Blueprint $table) {
+        Schema::create('friendships', function (Blueprint $table) {
             $table->increments('id');
             $table->morphs('sender');
             $table->morphs('recipient');
