@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file is part of Laravel Friendships.
+ *
+ * (c) Christopher Lass <arubacao@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ */
 
 namespace Arubacao\Friendships\Traits;
 
@@ -9,23 +18,29 @@ use Illuminate\Database\Eloquent\Model;
 trait Friendable
 {
     /**
+     * 1) Return FALSE when recipient has blocked sender
+     * 2) Return existing Friendship
+     * 3) Return newly created Friendship.
+     *
      * @param Model $recipient
      *
      * @return \Arubacao\Friendships\Models\Friendship|false
      */
     public function befriend(Model $recipient)
     {
-        if (! $this->canBefriend($recipient)) {
+        if ($this->isBlockedBy($recipient)) {
             return false;
+        }
+
+        if (!$this->canBefriend($recipient)) {
+            return $this->getFriendship($recipient);
         }
 
         $friendship = (new Friendship())->fillRecipient($recipient)->fill([
             'status' => Status::PENDING,
         ]);
 
-        $this->friends()->save($friendship);
-
-        return $friendship;
+        return $this->friends()->save($friendship);
     }
 
     /**
@@ -240,12 +255,14 @@ trait Friendable
      */
     public function canBefriend($recipient)
     {
-        //If sender has a friendship with the recipient return false
-        if ($friendship = $this->getFriendship($recipient)) {
-            //if previous friendship was Denied then let the user send fr
-            if (! $friendship->status == Status::DENIED) {
-                return false;
-            }
+        /*
+         * When there is no existing Friendship
+         * Or there is an existing DENIED Friendship
+         * --> true
+         */
+        $friendship = $this->getFriendship($recipient);
+        if ($friendship && $friendship->status != Status::DENIED) {
+            return false;
         }
 
         return true;
