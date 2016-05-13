@@ -2,7 +2,6 @@
 
 namespace Arubacao\Friendships\Models;
 
-use Arubacao\Friendships\Status;
 use Illuminate\Database\Eloquent\Model;
 
 class Friendship extends Model
@@ -41,7 +40,7 @@ class Friendship extends Model
     {
         return $this->fill([
             'recipient_id' => $recipient->getKey(),
-            'recipient_type' => get_class($recipient)
+            'recipient_type' => get_class($recipient),
         ]);
     }
 
