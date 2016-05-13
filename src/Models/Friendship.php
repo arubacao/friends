@@ -74,10 +74,10 @@ class Friendship extends Model
      */
     public function scopeBetweenModels($query, $sender, $recipient)
     {
-        $query->where(function ($queryIn) use ($sender, $recipient) {
-            $queryIn->where(function ($q) use ($sender, $recipient) {
+        $query->where(function($queryIn) use ($sender, $recipient) {
+            $queryIn->where(function($q) use ($sender, $recipient) {
                 $q->whereSender($sender)->whereRecipient($recipient);
-            })->orWhere(function ($q) use ($sender, $recipient) {
+            })->orWhere(function($q) use ($sender, $recipient) {
                 $q->whereSender($recipient)->whereRecipient($sender);
             });
         });
