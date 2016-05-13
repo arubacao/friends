@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file is part of Laravel Friendships.
+ *
+ * (c) Christopher Lass <arubacao@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ */
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -19,7 +28,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
     }
 
     /** @test */
-    public function user_can_not_send_a_friend_request_if_frienship_is_pending()
+    public function user_can_not_send_a_friend_request_if_friendship_is_pending()
     {
         $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
         $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
@@ -32,7 +41,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
 
     /** @test */
-    public function user_can_send_a_friend_request_if_frienship_is_denied()
+    public function user_can_send_a_friend_request_if_friendship_is_denied()
     {
         $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
         $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
@@ -41,6 +50,8 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipient->denyFriendRequest($sender);
 
         $sender->befriend($recipient);
+
+        dd($recipient->findFriendship($sender)->get());
 
         $this->assertCount(1, $recipient->getFriendRequests());
     }
