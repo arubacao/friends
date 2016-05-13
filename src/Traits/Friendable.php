@@ -249,7 +249,7 @@ trait Friendable
         //If sender has a friendship with the recipient return false
         if ($friendship = $this->getFriendship($recipient)) {
             //if previous friendship was Denied then let the user send fr
-            if(!$friendship->status == Status::DENIED){
+            if (!$friendship->status == Status::DENIED) {
                 return false;
             }
         }
@@ -343,5 +343,4 @@ trait Friendable
     {
         return $this->morphMany(Friendship::class, 'sender');
     }
-
 }
