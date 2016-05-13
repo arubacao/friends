@@ -22,7 +22,7 @@ class FriendshipsServiceProvider extends ServiceProvider
         $target = database_path('migrations').'/'.$timestamp.'_create_friendships_table.php';
         $this->publishes([$stub => $target], 'migrations');
     }
-    
+
     /**
      * Register any application services.
      *
