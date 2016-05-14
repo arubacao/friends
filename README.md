@@ -59,7 +59,7 @@ $user->sendFriendshipRequestTo($recipient);
 
 #### Accept a Friend Request
 ```php
-$user->acceptFriendRequest($recipient);
+$user->acceptFriendshipRequestFrom($recipient);
 ```
 
 #### Deny a Friend Request

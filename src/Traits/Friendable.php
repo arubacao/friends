@@ -83,7 +83,7 @@ trait Friendable
      *
      * @return bool|int
      */
-    public function acceptFriendRequest(Model $recipient)
+    public function acceptFriendshipRequestFrom(Model $recipient)
     {
         return $this->findFriendship($recipient)
             ->whereRecipient($this)
