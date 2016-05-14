@@ -64,7 +64,7 @@ $user->acceptFriendshipRequestFrom($recipient);
 
 #### Deny a Friend Request
 ```php
-$user->denyFriendRequest($recipient);
+$user->denyFriendshipRequestFrom($recipient);
 ```
 
 #### Remove Friend

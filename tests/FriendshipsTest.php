@@ -31,7 +31,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->denyFriendRequest($sender);
+        $recipients[2]->denyFriendshipRequestFrom($sender);
         $this->assertCount(3, $sender->getAllFriendships());
     }
 
@@ -46,7 +46,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->denyFriendRequest($sender);
+        $recipients[2]->denyFriendshipRequestFrom($sender);
         $this->assertEquals(2, $sender->getFriendsCount());
     }
 
@@ -61,7 +61,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->denyFriendRequest($sender);
+        $recipients[2]->denyFriendshipRequestFrom($sender);
         $this->assertCount(2, $sender->getAcceptedFriendships());
     }
 
@@ -76,7 +76,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->denyFriendRequest($sender);
+        $recipients[2]->denyFriendshipRequestFrom($sender);
         $this->assertCount(2, $sender->getAcceptedFriendships());
 
         $this->assertCount(1, $recipients[0]->getAcceptedFriendships());
@@ -109,7 +109,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->denyFriendRequest($sender);
+        $recipients[2]->denyFriendshipRequestFrom($sender);
         $this->assertCount(1, $sender->getDeniedFriendships());
     }
 
@@ -139,7 +139,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->denyFriendRequest($sender);
+        $recipients[2]->denyFriendshipRequestFrom($sender);
 
         $this->assertCount(2, $sender->getFriends());
         $this->assertCount(1, $recipients[1]->getFriends());
@@ -160,7 +160,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->denyFriendRequest($sender);
+        $recipients[2]->denyFriendshipRequestFrom($sender);
         $recipients[3]->acceptFriendshipRequestFrom($sender);
         $recipients[4]->acceptFriendshipRequestFrom($sender);
 

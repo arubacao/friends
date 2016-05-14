@@ -65,7 +65,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
 
         $sender->sendFriendshipRequestTo($recipient);
-        $recipient->denyFriendRequest($sender);
+        $recipient->denyFriendshipRequestFrom($sender);
         $sender->sendFriendshipRequestTo($recipient);
 
         $this->assertCount(1, $recipient->getFriendRequests());
@@ -78,7 +78,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $recipient = factory(\Arubacao\Tests\Friendships\Models\User::class)->create();
 
         $sender->sendFriendshipRequestTo($recipient);
-        $recipient->denyFriendRequest($sender);
+        $recipient->denyFriendshipRequestFrom($sender);
         $sender->sendFriendshipRequestTo($recipient);
 
         $this->assertCount(1, \Arubacao\Friendships\Models\Friendship::betweenModels($sender, $recipient)->get());
@@ -158,7 +158,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
         $sender->sendFriendshipRequestTo($recipient);
 
-        $recipient->denyFriendRequest($sender);
+        $recipient->denyFriendshipRequestFrom($sender);
 
         $this->assertFalse($recipient->hasAcceptedFriendshipWith($sender));
 

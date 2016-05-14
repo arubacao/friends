@@ -97,7 +97,7 @@ trait Friendable
      *
      * @return bool|int
      */
-    public function denyFriendRequest(Model $recipient)
+    public function denyFriendshipRequestFrom(Model $recipient)
     {
         return $this->findFriendship($recipient)
             ->whereRecipient($this)
