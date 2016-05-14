@@ -18,12 +18,6 @@ use Illuminate\Database\Eloquent\Model;
 trait Friendable
 {
     /**
-     * 1) Return existing Friendship
-     * 2) When existing DENIED Friendship
-     *    -> set status to PENDING
-     *    -> return updated Friendship
-     * 3) Return newly created Friendship.
-     *
      * @param Model $recipient
      *
      * @return \Arubacao\Friendships\Models\Friendship|false
@@ -31,6 +25,7 @@ trait Friendable
     public function sendFriendshipRequestTo(Model $recipient)
     {
         if (!$this->canSendFriendshipRequest($recipient)) {
+            // Return existing Friendship
             return $this->getFriendshipWith($recipient);
         }
 
@@ -46,11 +41,25 @@ trait Friendable
     /**
      * @param Model $recipient
      *
+     * @return bool|int
+     */
+    public function acceptFriendshipRequestFrom(Model $recipient)
+    {
+        return $this->findFriendshipWith($recipient)
+            ->whereRecipient($this)
+            ->update([
+                'status' => Status::ACCEPTED,
+            ]);
+    }
+
+    /**
+     * @param Model $recipient
+     *
      * @return bool
      */
     public function removeFriendshipWith(Model $recipient)
     {
-        return $this->findFriendship($recipient)->delete();
+        return $this->findFriendshipWith($recipient)->delete();
     }
 
     /**
@@ -73,24 +82,12 @@ trait Friendable
      */
     public function hasAcceptedFriendshipWith(Model $recipient)
     {
-        return $this->findFriendship($recipient)
+        return $this->findFriendshipWith($recipient)
             ->where('status', Status::ACCEPTED)
             ->exists();
     }
 
-    /**
-     * @param Model $recipient
-     *
-     * @return bool|int
-     */
-    public function acceptFriendshipRequestFrom(Model $recipient)
-    {
-        return $this->findFriendship($recipient)
-            ->whereRecipient($this)
-            ->update([
-                'status' => Status::ACCEPTED,
-            ]);
-    }
+
 
     /**
      * @param Model $recipient
@@ -99,7 +96,7 @@ trait Friendable
      */
     public function denyFriendshipRequestFrom(Model $recipient)
     {
-        return $this->findFriendship($recipient)
+        return $this->findFriendshipWith($recipient)
             ->whereRecipient($this)
             ->update([
                 'status' => Status::DENIED,
@@ -114,7 +111,7 @@ trait Friendable
     public function blockModel(Model $recipient)
     {
         //if there is a friendship between two models (users) delete it
-        $this->findFriendship($recipient)
+        $this->findFriendshipWith($recipient)
             ->delete();
 
         $friendship = Friendship::firstOrNewRecipient($recipient)
@@ -132,7 +129,7 @@ trait Friendable
      */
     public function unblockModel(Model $recipient)
     {
-        return $this->findFriendship($recipient)->delete();
+        return $this->findFriendshipWith($recipient)->delete();
     }
 
     /**
@@ -142,7 +139,7 @@ trait Friendable
      */
     public function getFriendshipWith(Model $recipient)
     {
-        return $this->findFriendship($recipient)->first();
+        return $this->findFriendshipWith($recipient)->first();
     }
 
     /**
@@ -284,7 +281,7 @@ trait Friendable
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function findFriendship(Model $recipient)
+    private function findFriendshipWith(Model $recipient)
     {
         return Friendship::betweenModels($this, $recipient);
     }
