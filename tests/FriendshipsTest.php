@@ -124,7 +124,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
-        $recipients[2]->blockFriend($sender);
+        $recipients[2]->blockModel($sender);
         $this->assertCount(1, $sender->getBlockedFriendships());
     }
 

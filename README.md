@@ -74,12 +74,12 @@ $user->removeFriendshipWith($recipient);
 
 #### Block a Model
 ```php
-$user->blockFriend($recipient);
+$user->blockModel($recipient);
 ```
 
 #### Unblock a Model
 ```php
-$user->unblockFriend($recipient);
+$user->unblockModel($recipient);
 ```
 
 #### Check if Model is Friend with another Model

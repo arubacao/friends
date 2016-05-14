@@ -172,7 +172,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
         $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
 
-        $sender->blockFriend($recipient);
+        $sender->blockModel($recipient);
 
         $this->assertTrue($recipient->isBlockedBy($sender));
         $this->assertTrue($sender->hasBlocked($recipient));
@@ -186,8 +186,8 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
         $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
 
-        $sender->blockFriend($recipient);
-        $sender->unblockFriend($recipient);
+        $sender->blockModel($recipient);
+        $sender->unblockModel($recipient);
 
         $this->assertFalse($recipient->isBlockedBy($sender));
         $this->assertFalse($sender->hasBlocked($recipient));

@@ -111,9 +111,9 @@ trait Friendable
      *
      * @return \Arubacao\Friendships\Models\Friendship
      */
-    public function blockFriend(Model $recipient)
+    public function blockModel(Model $recipient)
     {
-        //if there is a friendship between two users delete it
+        //if there is a friendship between two models (users) delete it
         $this->findFriendship($recipient)
             ->delete();
 
@@ -130,7 +130,7 @@ trait Friendable
      *
      * @return mixed
      */
-    public function unblockFriend(Model $recipient)
+    public function unblockModel(Model $recipient)
     {
         return $this->findFriendship($recipient)->delete();
     }
