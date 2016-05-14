@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file is part of Laravel Friendships.
+ *
+ * (c) Christopher Lass <arubacao@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ */
 
 namespace Arubacao\Friendships\Models;
 
@@ -7,11 +16,15 @@ use Illuminate\Database\Eloquent\Model;
 class Friendship extends Model
 {
     /**
+     * The table associated with the model.
+     *
      * @var string
      */
-    public $table = 'friendships';
+    protected $table = 'friendships';
 
     /**
+     * The attributes that aren't mass assignable.
+     *
      * @var array
      */
     protected $guarded = ['id', 'created_at', 'updated_at'];
@@ -32,16 +45,16 @@ class Friendship extends Model
         return $this->morphTo('recipient');
     }
 
+
     /**
      * @param Model $recipient
-     *
-     * @return $this
+     * @return Friendship
      */
-    public function fillRecipient($recipient)
-    {
-        return $this->fill([
-            'recipient_id' => $recipient->getKey(),
-            'recipient_type' => get_class($recipient),
+
+    public static function firstOrNewRecipient($recipient) {
+        return Friendship::firstOrNew([
+            'recipient_id'   => $recipient->getKey(),
+            'recipient_type' => $recipient->getMorphClass(),
         ]);
     }
 
@@ -54,7 +67,7 @@ class Friendship extends Model
     public function scopeWhereRecipient($query, $model)
     {
         return $query->where('recipient_id', $model->getKey())
-            ->where('recipient_type', get_class($model));
+            ->where('recipient_type', $model->getMorphClass());
     }
 
     /**
@@ -66,7 +79,7 @@ class Friendship extends Model
     public function scopeWhereSender($query, $model)
     {
         return $query->where('sender_id', $model->getKey())
-            ->where('sender_type', get_class($model));
+            ->where('sender_type', $model->getMorphClass());
     }
 
     /**
