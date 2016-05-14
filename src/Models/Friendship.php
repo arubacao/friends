@@ -13,6 +13,17 @@ namespace Arubacao\Friendships\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Arubacao\Friendships\Models\Friendship
+ *
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $sender
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $recipient
+ * @method static \Illuminate\Database\Query\Builder|\Arubacao\Friendships\Models\Friendship whereRecipient($model)
+ * @method static \Illuminate\Database\Query\Builder|\Arubacao\Friendships\Models\Friendship whereSender($model)
+ * @method static \Illuminate\Database\Query\Builder|\Arubacao\Friendships\Models\Friendship betweenModels($sender, $recipient)
+ * @mixin \Eloquent
+ */
+
 class Friendship extends Model
 {
     /**
