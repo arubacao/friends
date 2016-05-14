@@ -1,16 +1,17 @@
+![friendships-img](http://www.arubacao.com/laravel-friendships.jpeg)
+
 # Laravel Friendships
+
 [![Build Status](https://img.shields.io/travis/arubacao/laravel-friendships/master.svg?style=flat-square)](https://travis-ci.org/arubacao/laravel-friendships)
 [![Latest Version](https://img.shields.io/packagist/v/arubacao/laravel-friendships.svg?style=flat-square)](https://packagist.org/packages/arubacao/laravel-friendships)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/9c0e986c-44e0-417d-bd8c-96ea170bcb50.svg?style=flat-square)](https://insight.sensiolabs.com/projects/9c0e986c-44e0-417d-bd8c-96ea170bcb50)
 [![Quality Score](https://img.shields.io/scrutinizer/g/arubacao/laravel-friendships.svg?style=flat-square)](https://scrutinizer-ci.com/g/arubacao/laravel-friendships)
-[![Total Downloads](https://img.shields.io/packagist/dt/arubacao/laravel-friendships.svg?style=flat-square)](https://packagist.org/packages/arubacao/laravel-friendships)
 
+## Organise Friendships (Relationships) Between Models (Users) in Laravel and Lumen.
+#### Friendships provides everything you need to easily implement your own Facebook like Friend System.
 
-This package gives Eloqent models the ability to manage their friendships.
-You can easily design a Facebook like Friend System.
-
-##Models can:
+## Models can:
 - Send Friend Requests
 - Accept Friend Requests
 - Deny Friend Requests
@@ -48,7 +49,7 @@ class User extends Model
 }
 ```
 
-## How to use 
+## How to use
 [Check the Test file to see the package in action](https://github.com/arubacao/laravel-friendships/blob/master/tests/FriendshipsTest.php)
 
 #### Send a Friend Request
@@ -136,7 +137,7 @@ $user->getBlockedFriendships();
 $user->getFriendRequests();
 ```
 
-#### Get the number of Friends 
+#### Get the number of Friends
 ```php
 $user->getFriendsCount();
 ```
