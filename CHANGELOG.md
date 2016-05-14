@@ -4,6 +4,14 @@ It adheres to [Semantic Versioning](http://semver.org/).
 `MAJOR.MINOR.PATCH`
 `Breaking.Feature.Bugfix`
 
+## 1.2.0 - x May 2016
+#### Added
+- Enable decoupling of database from application's internal structure (see MorphMap)
+
+#### Changed
+- Return `FALSE` when recipient has blocked sender (`function befriend`)
+- Return `Friendship` when there is an existing Friendship (`function befriend`)
+
 ## 1.1.0 - 13 May 2016
 #### Added
 - Style CI

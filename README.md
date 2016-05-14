@@ -54,7 +54,7 @@ class User extends Model
 
 #### Send a Friend Request
 ```php
-$user->befriend($recipient);
+$user->sendFriendshipRequestTo($recipient);
 ```
 
 #### Accept a Friend Request
@@ -69,7 +69,7 @@ $user->denyFriendRequest($recipient);
 
 #### Remove Friend
 ```php
-$user->unfriend($recipient);
+$user->removeFriendshipWith($recipient);
 ```
 
 #### Block a Model
@@ -84,7 +84,7 @@ $user->unblockFriend($recipient);
 
 #### Check if Model is Friend with another Model
 ```php
-$user->isFriendWith($recipient);
+$user->hasAcceptedFriendshipWith($recipient);
 ```
 
 #### Check if Model has a pending friend request from another Model
@@ -158,3 +158,5 @@ $user->getFriends($perPage = 20);
 ```php
 $user->getFriendsOfFriends($perPage = 20);
 ```
+
+[![Analytics](https://ga-beacon.appspot.com/UA-77737156-1/readme?pixel)](https://github.com/arubacao/laravel-friendships)

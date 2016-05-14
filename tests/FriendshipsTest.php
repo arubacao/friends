@@ -11,158 +11,14 @@
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Arubacao\Friendships\Status;
 
 class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
 {
     use DatabaseTransactions;
 
-    /** @test */
-    public function user_can_send_a_friend_request()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-
-        $sender->befriend($recipient);
-
-        $this->assertCount(1, $recipient->getFriendRequests());
-    }
-
-    /** @test */
-    public function user_can_not_send_a_friend_request_if_friendship_is_pending()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $sender->befriend($recipient);
-        $sender->befriend($recipient);
-        $sender->befriend($recipient);
-
-        $this->assertCount(1, $recipient->getFriendRequests());
-    }
 
 
-    /** @test */
-    public function user_can_send_a_friend_request_if_friendship_is_denied()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-
-        $sender->befriend($recipient);
-        $recipient->denyFriendRequest($sender);
-
-        $sender->befriend($recipient);
-
-        dd($recipient->findFriendship($sender)->get());
-
-        $this->assertCount(1, $recipient->getFriendRequests());
-    }
-
-    /** @test */
-    public function user_is_friend_with_another_user_if_accepts_a_friend_request()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        //send fr
-        $sender->befriend($recipient);
-        //accept fr
-        $recipient->acceptFriendRequest($sender);
-
-        $this->assertTrue($recipient->isFriendWith($sender));
-        $this->assertTrue($sender->isFriendWith($recipient));
-        //fr has been delete
-        $this->assertCount(0, $recipient->getFriendRequests());
-    }
-
-    /** @test */
-    public function user_is_not_friend_with_another_user_until_he_accepts_a_friend_request()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        //send fr
-        $sender->befriend($recipient);
-
-        $this->assertFalse($recipient->isFriendWith($sender));
-        $this->assertFalse($sender->isFriendWith($recipient));
-    }
-
-    /** @test */
-    public function user_has_friend_request_from_another_user_if_he_received_a_friend_request()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        //send fr
-        $sender->befriend($recipient);
-
-        $this->assertTrue($recipient->hasFriendRequestFrom($sender));
-        $this->assertFalse($sender->hasFriendRequestFrom($recipient));
-    }
-
-    /** @test */
-    public function user_has_not_friend_request_from_another_user_if_he_accepted_the_friend_request()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        //send fr
-        $sender->befriend($recipient);
-        //accept fr
-        $recipient->acceptFriendRequest($sender);
-
-        $this->assertFalse($recipient->hasFriendRequestFrom($sender));
-        $this->assertFalse($sender->hasFriendRequestFrom($recipient));
-    }
-
-    /** @test */
-    public function user_cannot_accept_his_own_friend_request(){
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-
-        //send fr
-        $sender->befriend($recipient);
-
-        $sender->acceptFriendRequest($recipient);
-        $this->assertFalse($recipient->isFriendWith($sender));
-    }
-
-    /** @test */
-    public function user_can_deny_a_friend_request()
-    {
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $sender->befriend($recipient);
-
-        $recipient->denyFriendRequest($sender);
-
-        $this->assertFalse($recipient->isFriendWith($sender));
-
-        //fr has been delete
-        $this->assertCount(0, $recipient->getFriendRequests());
-        $this->assertCount(1, $sender->getDeniedFriendships());
-    }
-
-    /** @test */
-    public function user_can_block_another_user(){
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-
-        $sender->blockFriend($recipient);
-
-        $this->assertTrue($recipient->isBlockedBy($sender));
-        $this->assertTrue($sender->hasBlocked($recipient));
-        //sender is not blocked by receipient
-        $this->assertFalse($sender->isBlockedBy($recipient));
-        $this->assertFalse($recipient->hasBlocked($sender));
-    }
-
-    /** @test */
-    public function user_can_unblock_a_blocked_user(){
-        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
-
-        $sender->blockFriend($recipient);
-        $sender->unblockFriend($recipient);
-
-        $this->assertFalse($recipient->isBlockedBy($sender));
-        $this->assertFalse($sender->hasBlocked($recipient));
-    }
 
     /** @test */
     public function it_returns_all_user_friendships(){
@@ -170,7 +26,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(3)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -185,7 +41,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(3)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -200,7 +56,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(3)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -215,7 +71,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(4)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -235,7 +91,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(3)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -248,7 +104,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(3)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -263,7 +119,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(3)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -278,7 +134,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(4)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -299,7 +155,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(6)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
         }
 
         $recipients[0]->acceptFriendRequest($sender);
@@ -325,12 +181,12 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients = factory(Arubacao\Tests\Friendships\Models\User::class)->times(2)->create();
         $fofs = factory(Arubacao\Tests\Friendships\Models\User::class)->times(5)->create()->chunk(3);
         foreach ($recipients as $key => $recipient) {
-            $sender->befriend($recipient);
+            $sender->sendFriendshipRequestTo($recipient);
             $recipient->acceptFriendRequest($sender);
 
             //add some friends to each recipient too
             foreach ($fofs[$key] as $fof) {
-                $recipient->befriend($fof);
+                $recipient->sendFriendshipRequestTo($fof);
                 $fof->acceptFriendRequest($recipient);
             }
         }

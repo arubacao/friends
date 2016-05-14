@@ -28,20 +28,18 @@ trait Friendable
      *
      * @return \Arubacao\Friendships\Models\Friendship|false
      */
-    public function befriend(Model $recipient)
+    public function sendFriendshipRequestTo(Model $recipient)
     {
-        if (!$this->canBefriend($recipient)) {
-            return $this->getFriendship($recipient);
+        if (!$this->canSendFriendshipRequest($recipient)) {
+            return $this->getFriendshipWith($recipient);
         }
 
-        $friendship = Friendship::firstOrNew([
-            'recipient_id' => $recipient->getKey(),
-            'recipient_type' => get_class($recipient),
-        ])->fill([
+        $friendship = Friendship::firstOrNewRecipient($recipient)
+            ->fill([
             'status' => Status::PENDING,
         ]);
 
-        $this->friends()->save($friendship);
+        $this->friendships()->save($friendship);
         return $friendship;
     }
 
@@ -50,7 +48,7 @@ trait Friendable
      *
      * @return bool
      */
-    public function unfriend(Model $recipient)
+    public function removeFriendshipWith(Model $recipient)
     {
         return $this->findFriendship($recipient)->delete();
     }
@@ -62,7 +60,10 @@ trait Friendable
      */
     public function hasFriendRequestFrom(Model $recipient)
     {
-        return Friendship::whereRecipient($this)->whereSender($recipient)->whereStatus(Status::PENDING)->exists();
+        return Friendship::whereRecipient($this)
+            ->whereSender($recipient)
+            ->whereStatus(Status::PENDING)
+            ->exists();
     }
 
     /**
@@ -70,9 +71,11 @@ trait Friendable
      *
      * @return bool
      */
-    public function isFriendWith(Model $recipient)
+    public function hasAcceptedFriendshipWith(Model $recipient)
     {
-        return $this->findFriendship($recipient)->where('status', Status::ACCEPTED)->exists();
+        return $this->findFriendship($recipient)
+            ->where('status', Status::ACCEPTED)
+            ->exists();
     }
 
     /**
@@ -82,9 +85,11 @@ trait Friendable
      */
     public function acceptFriendRequest(Model $recipient)
     {
-        return $this->findFriendship($recipient)->whereRecipient($this)->update([
-            'status' => Status::ACCEPTED,
-        ]);
+        return $this->findFriendship($recipient)
+            ->whereRecipient($this)
+            ->update([
+                'status' => Status::ACCEPTED,
+            ]);
     }
 
     /**
@@ -94,9 +99,11 @@ trait Friendable
      */
     public function denyFriendRequest(Model $recipient)
     {
-        return $this->findFriendship($recipient)->whereRecipient($this)->update([
-            'status' => Status::DENIED,
-        ]);
+        return $this->findFriendship($recipient)
+            ->whereRecipient($this)
+            ->update([
+                'status' => Status::DENIED,
+            ]);
     }
 
     /**
@@ -107,13 +114,15 @@ trait Friendable
     public function blockFriend(Model $recipient)
     {
         //if there is a friendship between two users delete it
-        $this->findFriendship($recipient)->delete();
+        $this->findFriendship($recipient)
+            ->delete();
 
-        $friendship = (new Friendship())->fillRecipient($recipient)->fill([
-            'status' => Status::BLOCKED,
-        ]);
+        $friendship = Friendship::firstOrNewRecipient($recipient)
+            ->fill([
+                'status' => Status::BLOCKED,
+            ]);
 
-        return $this->friends()->save($friendship);
+        return $this->friendships()->save($friendship);
     }
 
     /**
@@ -131,7 +140,7 @@ trait Friendable
      *
      * @return \Arubacao\Friendships\Models\Friendship
      */
-    public function getFriendship(Model $recipient)
+    public function getFriendshipWith(Model $recipient)
     {
         return $this->findFriendship($recipient)->first();
     }
@@ -183,7 +192,7 @@ trait Friendable
      */
     public function hasBlocked(Model $recipient)
     {
-        return $this->friends()->whereRecipient($recipient)->whereStatus(Status::BLOCKED)->exists();
+        return $this->friendships()->whereRecipient($recipient)->whereStatus(Status::BLOCKED)->exists();
     }
 
     /**
@@ -255,14 +264,14 @@ trait Friendable
      *
      * @return bool
      */
-    public function canBefriend($recipient)
+    public function canSendFriendshipRequest($recipient)
     {
         /*
          * When there is no existing Friendship
          * Or there is an existing DENIED Friendship
          * --> true
          */
-        $friendship = $this->getFriendship($recipient);
+        $friendship = $this->getFriendshipWith($recipient);
         if ($friendship && $friendship->status != Status::DENIED) {
             return false;
         }
@@ -350,7 +359,7 @@ trait Friendable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function friends()
+    public function friendships()
     {
         return $this->morphMany(Friendship::class, 'sender');
     }
