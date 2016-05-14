@@ -89,7 +89,7 @@ $user->hasAcceptedFriendshipWith($recipient);
 
 #### Check if Model has a pending friend request from another Model
 ```php
-$user->hasFriendRequestFrom($recipient);
+$user->hasFriendshipRequestFrom($recipient);
 ```
 
 #### Check if Model has blocked another Model

@@ -92,8 +92,8 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         
         $sender->sendFriendshipRequestTo($recipient);
 
-        $this->assertTrue($recipient->hasFriendRequestFrom($sender));
-        $this->assertFalse($sender->hasFriendRequestFrom($recipient));
+        $this->assertTrue($recipient->hasFriendshipRequestFrom($sender));
+        $this->assertFalse($sender->hasFriendshipRequestFrom($recipient));
     }
 
     /** @test */
@@ -134,8 +134,8 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $sender->sendFriendshipRequestTo($recipient);
         $recipient->acceptFriendRequest($sender);
 
-        $this->assertFalse($recipient->hasFriendRequestFrom($sender));
-        $this->assertFalse($sender->hasFriendRequestFrom($recipient));
+        $this->assertFalse($recipient->hasFriendshipRequestFrom($sender));
+        $this->assertFalse($sender->hasFriendshipRequestFrom($recipient));
     }
 
 
