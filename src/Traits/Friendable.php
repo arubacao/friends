@@ -18,8 +18,10 @@ use Illuminate\Database\Eloquent\Model;
 trait Friendable
 {
     /**
-     * 1) Return FALSE when recipient has blocked sender
-     * 2) Return existing Friendship
+     * 1) Return existing Friendship
+     * 2) When existing DENIED Friendship
+     *    -> set status to PENDING
+     *    -> return updated Friendship
      * 3) Return newly created Friendship.
      *
      * @param Model $recipient
@@ -28,19 +30,19 @@ trait Friendable
      */
     public function befriend(Model $recipient)
     {
-        if ($this->isBlockedBy($recipient)) {
-            return false;
-        }
-
         if (!$this->canBefriend($recipient)) {
             return $this->getFriendship($recipient);
         }
 
-        $friendship = (new Friendship())->fillRecipient($recipient)->fill([
+        $friendship = Friendship::firstOrNew([
+            'recipient_id' => $recipient->getKey(),
+            'recipient_type' => get_class($recipient),
+        ])->fill([
             'status' => Status::PENDING,
         ]);
 
-        return $this->friends()->save($friendship);
+        $this->friends()->save($friendship);
+        return $friendship;
     }
 
     /**
@@ -194,7 +196,7 @@ trait Friendable
         return $recipient->hasBlocked($this);
     }
 
-    /**
+     /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getFriendRequests()
