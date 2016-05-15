@@ -25,7 +25,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
 
         $sender->sendFriendshipRequestTo($recipient);
 
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getReceivingPendingFriendships());
     }
 
 
@@ -54,7 +54,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $sender->sendFriendshipRequestTo($recipient);
         $sender->sendFriendshipRequestTo($recipient);
 
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getReceivingPendingFriendships());
         $this->assertCount(1, \Arubacao\Friendships\Models\Friendship::betweenModels($sender, $recipient)->get());
     }
 
@@ -68,7 +68,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $recipient->denyFriendshipRequestFrom($sender);
         $sender->sendFriendshipRequestTo($recipient);
 
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getReceivingPendingFriendships());
     }
 
     /** @test */
@@ -107,7 +107,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
 
         $this->assertTrue($recipient->hasAcceptedFriendshipWith($sender));
         $this->assertTrue($sender->hasAcceptedFriendshipWith($recipient));
-        $this->assertCount(0, $recipient->getFriendRequests());
+        $this->assertCount(0, $recipient->getReceivingPendingFriendships());
     }
 
     /** @todo: db check */
@@ -122,7 +122,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
 
         $this->assertFalse($recipient->hasAcceptedFriendshipWith($sender));
         $this->assertFalse($sender->hasAcceptedFriendshipWith($recipient));
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getReceivingPendingFriendships());
     }
 
     /** @test */
@@ -163,7 +163,7 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $this->assertFalse($recipient->hasAcceptedFriendshipWith($sender));
 
 
-        $this->assertCount(0, $recipient->getFriendRequests());
+        $this->assertCount(0, $recipient->getReceivingPendingFriendships());
         $this->assertCount(1, $sender->getDeniedFriendships());
     }
 

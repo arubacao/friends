@@ -134,7 +134,7 @@ $user->getBlockedFriendships();
 
 #### Get a list of pending Friend Requests
 ```php
-$user->getFriendRequests();
+$user->getReceivedFriendshipRequests();
 ```
 
 #### Get the number of Friends

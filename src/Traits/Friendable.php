@@ -41,6 +41,26 @@ trait Friendable
     /**
      * @param Model $recipient
      *
+     * @return bool
+     */
+    public function canSendFriendshipRequest($recipient)
+    {
+        /*
+         * When there is no existing Friendship
+         * Or there is an existing DENIED Friendship
+         * --> true
+         */
+        $friendship = $this->getFriendshipWith($recipient);
+        if ($friendship && $friendship->status != Status::DENIED) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Model $recipient
+     *
      * @return bool|int
      */
     public function acceptFriendshipRequestFrom(Model $recipient)
@@ -74,7 +94,7 @@ trait Friendable
     public function blockModel(Model $recipient)
     {
         //if there is a friendship between two models delete it
-        $this->findFriendshipsWith($recipient)->delete();
+        $this->removeFriendshipsWith($recipient);
 
         $friendship = Friendship::firstOrNewRecipient($recipient)
             ->fill([
@@ -87,7 +107,7 @@ trait Friendable
     /**
      * @param Model $recipient
      *
-     * @return mixed
+     * @return bool|null
      */
     public function unblockModel(Model $recipient)
     {
@@ -102,7 +122,7 @@ trait Friendable
      *
      * @return bool
      */
-    public function removeFriendshipWith(Model $recipient)
+    public function removeFriendshipsWith(Model $recipient)
     {
         return $this->findFriendshipsWith($recipient)->delete();
     }
@@ -125,14 +145,35 @@ trait Friendable
      *
      * @return bool
      */
-    public function hasAcceptedFriendshipWith(Model $recipient)
+    public function hasBlocked(Model $recipient)
     {
-        return $this->findFriendshipsWith($recipient)
-            ->where('status', Status::ACCEPTED)
+        return $this->friendships()
+            ->whereRecipient($recipient)
+            ->whereStatus(Status::BLOCKED)
             ->exists();
     }
 
+    /**
+     * @param Model $recipient
+     *
+     * @return bool
+     */
+    public function isBlockedBy(Model $recipient)
+    {
+        return $recipient->hasBlocked($this);
+    }
 
+    /**
+     * @param Model $recipient
+     *
+     * @return bool
+     */
+    public function hasAcceptedFriendshipWith(Model $recipient)
+    {
+        return $this->findFriendshipsWith($recipient)
+            ->whereStatus(Status::ACCEPTED)
+            ->exists();
+    }
 
     /**
      * @param Model $recipient
@@ -157,7 +198,7 @@ trait Friendable
      */
     public function getPendingFriendships()
     {
-        return $this->findFriendships(Status::PENDING)->get();
+        return $this->findFriendships()->whereStatus(Status::PENDING)->get();
     }
 
     /**
@@ -165,7 +206,7 @@ trait Friendable
      */
     public function getAcceptedFriendships()
     {
-        return $this->findFriendships(Status::ACCEPTED)->get();
+        return $this->findFriendships()->whereStatus(Status::ACCEPTED)->get();
     }
 
     /**
@@ -173,7 +214,7 @@ trait Friendable
      */
     public function getDeniedFriendships()
     {
-        return $this->findFriendships(Status::DENIED)->get();
+        return $this->findFriendships()->whereStatus(Status::DENIED)->get();
     }
 
     /**
@@ -181,35 +222,27 @@ trait Friendable
      */
     public function getBlockedFriendships()
     {
-        return $this->findFriendships(Status::BLOCKED)->get();
-    }
-
-    /**
-     * @param Model $recipient
-     *
-     * @return bool
-     */
-    public function hasBlocked(Model $recipient)
-    {
-        return $this->friendships()->whereRecipient($recipient)->whereStatus(Status::BLOCKED)->exists();
-    }
-
-    /**
-     * @param Model $recipient
-     *
-     * @return bool
-     */
-    public function isBlockedBy(Model $recipient)
-    {
-        return $recipient->hasBlocked($this);
+        return $this->findFriendships()->whereStatus(Status::BLOCKED)->get();
     }
 
      /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getFriendRequests()
+    public function getReceivingPendingFriendships()
     {
-        return Friendship::whereRecipient($this)->whereStatus(Status::PENDING)->get();
+        return Friendship::whereRecipient($this)
+            ->whereStatus(Status::PENDING)
+            ->get();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getSendingBlockedFriendships()
+    {
+        return Friendship::whereSender($this)
+            ->whereStatus(Status::BLOCKED)
+            ->get();
     }
 
     /**
@@ -217,15 +250,19 @@ trait Friendable
      * It will return the 'friends' models. ex: App\User.
      *
      * @param int $perPage Number
+     * @param int $page Number
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getFriends($perPage = 0)
+    public function getFriends($perPage = 0, $page = null)
     {
+
+        $friendships = $this->getAcceptedFriendships();
+
         if ($perPage == 0) {
-            return $this->getFriendsQueryBuilder()->get();
+            return $this->getFriendsQueryBuilder($friendships)->get();
         } else {
-            return $this->getFriendsQueryBuilder()->paginate($perPage);
+            return $this->getFriendsQueryBuilder($friendships)->paginate($perPage, $columns = ['*'], $pageName = 'page', $page);
         }
     }
 
@@ -253,29 +290,9 @@ trait Friendable
      */
     public function getFriendsCount()
     {
-        $friendsCount = $this->findFriendships(Status::ACCEPTED)->count();
+        $friendsCount = $this->findFriendships()->whereStatus(Status::ACCEPTED)->count();
 
         return $friendsCount;
-    }
-
-    /**
-     * @param Model $recipient
-     *
-     * @return bool
-     */
-    public function canSendFriendshipRequest($recipient)
-    {
-        /*
-         * When there is no existing Friendship
-         * Or there is an existing DENIED Friendship
-         * --> true
-         */
-        $friendship = $this->getFriendshipWith($recipient);
-        if ($friendship && $friendship->status != Status::DENIED) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -289,34 +306,28 @@ trait Friendable
     }
 
     /**
-     * @param $status
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function findFriendships($status = '%')
+    private function findFriendships()
     {
-        return Friendship::where('status', 'LIKE', $status)
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->whereSender($this);
-                })->orWhere(function ($q) {
-                    $q->whereRecipient($this);
-                });
-            });
+        return Friendship::allMyFriendships($this);
     }
 
     /**
      * Get the query builder of the 'friend' model.
      *
+     * @param \Illuminate\Database\Eloquent\Collection $friendships
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function getFriendsQueryBuilder()
+    private function getFriendsQueryBuilder($friendships)
     {
-        $friendships = $this->findFriendships(Status::ACCEPTED)->get(['sender_id', 'recipient_id']);
-        $recipients = $friendships->lists('recipient_id')->all();
-        $senders = $friendships->lists('sender_id')->all();
+        $recipients = $friendships->pluck('recipient_id')->all();
+        $senders = $friendships->pluck('sender_id')->all();
+        $ids = collect(array_merge($recipients, $senders))->filter(function ($value, $key) {
+            return $value != $this->getKey();
+        });;
 
-        return $this->where('id', '!=', $this->getKey())->whereIn('id', array_merge($recipients, $senders));
+        return $this->where($this->getKeyName(), '!=', $this->getKey())->whereIn($this->getKeyName(), $ids);
     }
 
     /**
@@ -327,8 +338,8 @@ trait Friendable
     private function friendsOfFriendsQueryBuilder()
     {
         $friendships = $this->findFriendships(Status::ACCEPTED)->get(['sender_id', 'recipient_id']);
-        $recipients = $friendships->lists('recipient_id')->all();
-        $senders = $friendships->lists('sender_id')->all();
+        $recipients = $friendships->pluck('recipient_id')->all();
+        $senders = $friendships->pluck('sender_id')->all();
 
         $friendIds = array_unique(array_merge($recipients, $senders));
 

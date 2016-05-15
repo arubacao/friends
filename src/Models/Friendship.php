@@ -18,9 +18,10 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $sender
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $recipient
- * @method static \Illuminate\Database\Query\Builder|\Arubacao\Friendships\Models\Friendship whereRecipient($model)
- * @method static \Illuminate\Database\Query\Builder|\Arubacao\Friendships\Models\Friendship whereSender($model)
- * @method static \Illuminate\Database\Query\Builder|\Arubacao\Friendships\Models\Friendship betweenModels($sender, $recipient)
+ * @method static \Illuminate\Database\Query\Builder whereRecipient($model)
+ * @method static \Illuminate\Database\Query\Builder whereSender($model)
+ * @method static \Illuminate\Database\Query\Builder betweenModels($sender, $recipient)
+ * @method static \Illuminate\Database\Query\Builder allMyFriendships($model)
  * @mixin \Eloquent
  */
 
@@ -82,7 +83,7 @@ class Friendship extends Model
     }
 
     /**
-     * @param $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param Model $model
      *
      * @return \Illuminate\Database\Eloquent\Builder
@@ -94,7 +95,7 @@ class Friendship extends Model
     }
 
     /**
-     * @param $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param Model $sender
      * @param Model $recipient
      *
@@ -102,12 +103,29 @@ class Friendship extends Model
      */
     public function scopeBetweenModels($query, $sender, $recipient)
     {
-        $query->where(function ($queryIn) use ($sender, $recipient) {
+        return $query->where(function ($queryIn) use ($sender, $recipient) {
             $queryIn->where(function ($q) use ($sender, $recipient) {
                 $q->whereSender($sender)->whereRecipient($recipient);
             })->orWhere(function ($q) use ($sender, $recipient) {
                 $q->whereSender($recipient)->whereRecipient($sender);
             });
         });
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param Model $model
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAllMyFriendships($query, $model)
+    {
+           return $query->where(function ($query) use ($model) {
+                $query->where(function ($q) use ($model) {
+                    $q->whereSender($model);
+                })->orWhere(function ($q) use ($model){
+                    $q->whereRecipient($model);
+                });
+            });
     }
 }
