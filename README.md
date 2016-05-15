@@ -139,19 +139,19 @@ $user->getReceivedFriendshipRequests();
 
 #### Get the number of Friends
 ```php
-$user->getFriendsCount();
+$user->getAcceptedFriendshipsCount();
 ```
 
 
 ### To get a collection of friend models (ex. User) you can use the following methods
 #### Get Friends
 ```php
-$user->getFriends();
+$user->getAcceptedModels();
 ```
 
 #### Get Friends Paginated
 ```php
-$user->getFriends($perPage = 20);
+$user->getAcceptedFriends($perPage = 20);
 ```
 
 #### Get Friends of Friends

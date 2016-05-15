@@ -18,6 +18,13 @@ use Illuminate\Database\Eloquent\Model;
 trait Friendable
 {
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function friendships()
+    {
+        return $this->morphMany(Friendship::class, 'sender');
+    }
+    /**
      * @param Model $recipient
      *
      * @return \Arubacao\Friendships\Models\Friendship|false
@@ -246,53 +253,52 @@ trait Friendable
     }
 
     /**
-     * This method will not return Friendship models
-     * It will return the 'friends' models. ex: App\User.
-     *
      * @param int $perPage Number
      * @param int $page Number
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getFriends($perPage = 0, $page = null)
+    public function getAcceptedModels($perPage = 0, $page = null)
     {
 
         $friendships = $this->getAcceptedFriendships();
+        $query = $this->getFriendsQueryBuilder($friendships);
 
         if ($perPage == 0) {
-            return $this->getFriendsQueryBuilder($friendships)->get();
+            return $query->get();
         } else {
-            return $this->getFriendsQueryBuilder($friendships)->paginate($perPage, $columns = ['*'], $pageName = 'page', $page);
+            return $query->paginate($perPage, $columns = ['*'], $pageName = 'page', $page);
         }
     }
 
     /**
-     * This method will not return Friendship models
-     * It will return the 'friends' models. ex: App\User.
-     *
      * @param int $perPage Number
+     * @param int $page Number
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getFriendsOfFriends($perPage = 0)
+    public function getBlockedModelsFromMe($perPage = 0, $page = null)
     {
+
+        $friendships = $this->getSendingBlockedFriendships();
+        $query = $this->getFriendsQueryBuilder($friendships);
+
         if ($perPage == 0) {
-            return $this->friendsOfFriendsQueryBuilder()->get();
+            return $query->get();
         } else {
-            return $this->friendsOfFriendsQueryBuilder()->paginate($perPage);
+            return $query->paginate($perPage, $columns = ['*'], $pageName = 'page', $page);
         }
     }
 
+
     /**
-     * Get the number of friends.
+     * Get the number of accepted Friendships.
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getFriendsCount()
+    public function getAcceptedFriendshipsCount()
     {
-        $friendsCount = $this->findFriendships()->whereStatus(Status::ACCEPTED)->count();
-
-        return $friendsCount;
+        return $this->getAcceptedFriendships()->count();
     }
 
     /**
@@ -314,6 +320,23 @@ trait Friendable
     }
 
     /**
+     * This method will not return Friendship models
+     * It will return the 'friends' models. ex: App\User.
+     *
+     * @param int $perPage Number
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getSecondDegreeAcceptedModels($perPage = 0)
+    {
+        if ($perPage == 0) {
+            return $this->modelsOfFriendshipsQueryBuilder()->get();
+        } else {
+            return $this->modelsOfFriendshipsQueryBuilder()->paginate($perPage);
+        }
+    }
+
+    /**
      * Get the query builder of the 'friend' model.
      *
      * @param \Illuminate\Database\Eloquent\Collection $friendships
@@ -323,11 +346,14 @@ trait Friendable
     {
         $recipients = $friendships->pluck('recipient_id')->all();
         $senders = $friendships->pluck('sender_id')->all();
-        $ids = collect(array_merge($recipients, $senders))->filter(function ($value, $key) {
-            return $value != $this->getKey();
-        });;
+        $friendIds = collect(array_merge($recipients, $senders))
+            ->unique()
+            ->filter(function ($value, $key) {
+                return $value != $this->getKey();
+            });
 
-        return $this->where($this->getKeyName(), '!=', $this->getKey())->whereIn($this->getKeyName(), $ids);
+        return $this->where($this->getKeyName(), '!=', $this->getKey())
+            ->whereIn($this->getKeyName(), $friendIds);
     }
 
     /**
@@ -335,13 +361,22 @@ trait Friendable
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    private function friendsOfFriendsQueryBuilder()
+    private function modelsOfFriendshipsQueryBuilder()
     {
-        $friendships = $this->findFriendships(Status::ACCEPTED)->get(['sender_id', 'recipient_id']);
+        $friendships = $this->findFriendships()
+            ->whereStatus(Status::ACCEPTED)
+            ->get([
+                'sender_id',
+                'recipient_id'
+            ]);
         $recipients = $friendships->pluck('recipient_id')->all();
         $senders = $friendships->pluck('sender_id')->all();
 
-        $friendIds = array_unique(array_merge($recipients, $senders));
+        $friendIds = collect(array_merge($recipients, $senders))
+            ->unique()
+            ->filter(function ($value, $key) {
+                return $value != $this->getKey();
+            });
 
         $fofs = Friendship::where('status', Status::ACCEPTED)
                           ->where(function ($query) use ($friendIds) {
@@ -352,25 +387,13 @@ trait Friendable
                               });
                           })->get(['sender_id', 'recipient_id']);
 
-        $fofIds = array_unique(
-            array_merge($fofs->pluck('sender_id')->all(), $fofs->lists('recipient_id')->all())
-        );
+        $fofIds = collect(array_merge($fofs->pluck('sender_id')->all(), $fofs->lists('recipient_id')->all()))
+            ->unique()
+            ->filter(function ($value, $key) use ($friendIds){
+                return $value != $this->getKey() && !$friendIds->contains($value);
+            });
 
-//      Alternative way using collection helpers
-//        $fofIds = array_unique(
-//            $fofs->map(function ($item) {
-//                return [$item->sender_id, $item->recipient_id];
-//            })->flatten()->all()
-//        );
-
-        return $this->whereIn('id', $fofIds)->whereNotIn('id', $friendIds);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function friendships()
-    {
-        return $this->morphMany(Friendship::class, 'sender');
+        return $this->whereNotIn('id', $friendIds)
+            ->whereIn($this->getKeyName(), $fofIds);
     }
 }

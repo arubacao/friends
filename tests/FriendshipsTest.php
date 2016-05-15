@@ -47,7 +47,7 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients[0]->acceptFriendshipRequestFrom($sender);
         $recipients[1]->acceptFriendshipRequestFrom($sender);
         $recipients[2]->denyFriendshipRequestFrom($sender);
-        $this->assertEquals(2, $sender->getFriendsCount());
+        $this->assertEquals(2, $sender->getAcceptedFriendshipsCount());
     }
 
     /** @test */
@@ -141,12 +141,12 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients[1]->acceptFriendshipRequestFrom($sender);
         $recipients[2]->denyFriendshipRequestFrom($sender);
 
-        $this->assertCount(2, $sender->getFriends());
-        $this->assertCount(1, $recipients[1]->getFriends());
-        $this->assertCount(0, $recipients[2]->getFriends());
-        $this->assertCount(0, $recipients[3]->getFriends());
+        $this->assertCount(2, $sender->getAcceptedModels());
+        $this->assertCount(1, $recipients[1]->getAcceptedModels());
+        $this->assertCount(0, $recipients[2]->getAcceptedModels());
+        $this->assertCount(0, $recipients[3]->getAcceptedModels());
 
-        $this->containsOnlyInstancesOf(Arubacao\Tests\Friendships\Models\User::class, $sender->getFriends());
+        $this->containsOnlyInstancesOf(Arubacao\Tests\Friendships\Models\User::class, $sender->getAcceptedModels());
     }
 
     /** @test */
@@ -165,14 +165,14 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
         $recipients[4]->acceptFriendshipRequestFrom($sender);
 
 
-        $this->assertCount(2, $sender->getFriends(2));
-        $this->assertCount(4, $sender->getFriends(0));
-        $this->assertCount(4, $sender->getFriends(10));
-        $this->assertCount(1, $recipients[1]->getFriends());
-        $this->assertCount(0, $recipients[2]->getFriends());
-        $this->assertCount(0, $recipients[5]->getFriends(2));
+        $this->assertCount(2, $sender->getAcceptedModels(2));
+        $this->assertCount(4, $sender->getAcceptedModels(0));
+        $this->assertCount(4, $sender->getAcceptedModels(10));
+        $this->assertCount(1, $recipients[1]->getAcceptedModels());
+        $this->assertCount(0, $recipients[2]->getAcceptedModels());
+        $this->assertCount(0, $recipients[5]->getAcceptedModels(2));
 
-        $this->containsOnlyInstancesOf(Arubacao\Tests\Friendships\Models\User::class, $sender->getFriends());
+        $this->containsOnlyInstancesOf(Arubacao\Tests\Friendships\Models\User::class, $sender->getAcceptedModels());
     }
 
     /** @test */
@@ -191,12 +191,12 @@ class FriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCase
             }
         }
 
-        $this->assertCount(2, $sender->getFriends());
-        $this->assertCount(4, $recipients[0]->getFriends());
-        $this->assertCount(3, $recipients[1]->getFriends());
+        $this->assertCount(2, $sender->getAcceptedModels());
+        $this->assertCount(4, $recipients[0]->getAcceptedModels());
+        $this->assertCount(3, $recipients[1]->getAcceptedModels());
 
-        $this->assertCount(5, $sender->getFriendsOfFriends());
+        $this->assertCount(5, $sender->getSecondDegreeAcceptedModels());
 
-        $this->containsOnlyInstancesOf(Arubacao\Tests\Friendships\Models\User::class, $sender->getFriendsOfFriends());
+        $this->containsOnlyInstancesOf(Arubacao\Tests\Friendships\Models\User::class, $sender->getSecondDegreeAcceptedModels());
     }
 }
