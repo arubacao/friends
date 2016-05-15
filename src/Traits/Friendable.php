@@ -6,9 +6,7 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
  */
-
 namespace Arubacao\Friendships\Traits;
 
 use Arubacao\Friendships\Models\Friendship;
@@ -24,6 +22,7 @@ trait Friendable
     {
         return $this->morphMany(Friendship::class, 'sender');
     }
+
     /**
      * @param Model $recipient
      *
@@ -31,7 +30,7 @@ trait Friendable
      */
     public function sendFriendshipRequestTo(Model $recipient)
     {
-        if (!$this->canSendFriendshipRequest($recipient)) {
+        if (! $this->canSendFriendshipRequest($recipient)) {
             // Return existing Friendship
             return $this->getFriendshipWith($recipient);
         }
@@ -42,6 +41,7 @@ trait Friendable
         ]);
 
         $this->friendships()->save($friendship);
+
         return $friendship;
     }
 
@@ -232,7 +232,7 @@ trait Friendable
         return $this->findFriendships()->whereStatus(Status::BLOCKED)->get();
     }
 
-     /**
+    /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getReceivingPendingFriendships()
@@ -260,7 +260,6 @@ trait Friendable
      */
     public function getAcceptedModels($perPage = 0, $page = null)
     {
-
         $friendships = $this->getAcceptedFriendships();
         $query = $this->getFriendsQueryBuilder($friendships);
 
@@ -279,7 +278,6 @@ trait Friendable
      */
     public function getBlockedModelsFromMe($perPage = 0, $page = null)
     {
-
         $friendships = $this->getSendingBlockedFriendships();
         $query = $this->getFriendsQueryBuilder($friendships);
 
@@ -289,7 +287,6 @@ trait Friendable
             return $query->paginate($perPage, $columns = ['*'], $pageName = 'page', $page);
         }
     }
-
 
     /**
      * Get the number of accepted Friendships.
@@ -367,7 +364,7 @@ trait Friendable
             ->whereStatus(Status::ACCEPTED)
             ->get([
                 'sender_id',
-                'recipient_id'
+                'recipient_id',
             ]);
         $recipients = $friendships->pluck('recipient_id')->all();
         $senders = $friendships->pluck('sender_id')->all();
@@ -389,8 +386,8 @@ trait Friendable
 
         $fofIds = collect(array_merge($fofs->pluck('sender_id')->all(), $fofs->lists('recipient_id')->all()))
             ->unique()
-            ->filter(function ($value, $key) use ($friendIds){
-                return $value != $this->getKey() && !$friendIds->contains($value);
+            ->filter(function ($value, $key) use ($friendIds) {
+                return $value != $this->getKey() && ! $friendIds->contains($value);
             });
 
         return $this->whereNotIn('id', $friendIds)
