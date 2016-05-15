@@ -1,5 +1,8 @@
 preset: laravel
 
+enabled:
+  - single_blank_line_before_namespace
+
 finder:
   exclude:
     - "tests"
