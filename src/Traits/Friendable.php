@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Arubacao\Friendships\Traits;
 
 use Arubacao\Friendships\Models\Friendship;
@@ -254,7 +255,7 @@ trait Friendable
 
     /**
      * @param int $perPage Number
-     * @param int $page Number
+     * @param int $page    Number
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -272,7 +273,7 @@ trait Friendable
 
     /**
      * @param int $perPage Number
-     * @param int $page Number
+     * @param int $page    Number
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -290,7 +291,7 @@ trait Friendable
 
     /**
      * @param int $perPage Number
-     * @param int $page Number
+     * @param int $page    Number
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -355,6 +356,7 @@ trait Friendable
      * Get the query builder of the 'friend' model.
      *
      * @param \Illuminate\Database\Eloquent\Collection $friendships
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     private function getFriendsQueryBuilder($friendships)
