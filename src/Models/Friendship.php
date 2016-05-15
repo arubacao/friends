@@ -6,15 +6,13 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
  */
-
 namespace Arubacao\Friendships\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Arubacao\Friendships\Models\Friendship
+ * Arubacao\Friendships\Models\Friendship.
  *
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $sender
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $recipient
@@ -24,7 +22,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Query\Builder allMyFriendships($model)
  * @mixin \Eloquent
  */
-
 class Friendship extends Model
 {
     /**
@@ -57,14 +54,13 @@ class Friendship extends Model
         return $this->morphTo('recipient');
     }
 
-
     /**
      * @param Model $recipient
      * @return Friendship
      */
-
-    public static function firstOrNewRecipient($recipient) {
-        return Friendship::firstOrNew([
+    public static function firstOrNewRecipient($recipient)
+    {
+        return self::firstOrNew([
             'recipient_id'   => $recipient->getKey(),
             'recipient_type' => $recipient->getMorphClass(),
         ]);
@@ -120,10 +116,10 @@ class Friendship extends Model
      */
     public function scopeAllMyFriendships($query, $model)
     {
-           return $query->where(function ($query) use ($model) {
+        return $query->where(function ($query) use ($model) {
                 $query->where(function ($q) use ($model) {
                     $q->whereSender($model);
-                })->orWhere(function ($q) use ($model){
+                })->orWhere(function ($q) use ($model) {
                     $q->whereRecipient($model);
                 });
             });
