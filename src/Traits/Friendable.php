@@ -258,6 +258,24 @@ trait Friendable
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
+    public function getReceivingPendingModels($perPage = 0, $page = null)
+    {
+        $friendships = $this->getReceivingPendingFriendships();
+        $query = $this->getFriendsQueryBuilder($friendships);
+
+        if ($perPage == 0) {
+            return $query->get();
+        } else {
+            return $query->paginate($perPage, $columns = ['*'], $pageName = 'page', $page);
+        }
+    }
+
+    /**
+     * @param int $perPage Number
+     * @param int $page Number
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getAcceptedModels($perPage = 0, $page = null)
     {
         $friendships = $this->getAcceptedFriendships();
@@ -276,7 +294,7 @@ trait Friendable
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getBlockedModelsFromMe($perPage = 0, $page = null)
+    public function getSendingBlockedModels($perPage = 0, $page = null)
     {
         $friendships = $this->getSendingBlockedFriendships();
         $query = $this->getFriendsQueryBuilder($friendships);
