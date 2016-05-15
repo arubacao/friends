@@ -36,7 +36,7 @@ trait Friendable
             return $this->getFriendshipWith($recipient);
         }
 
-        $friendship = Friendship::firstOrNewRecipient($recipient)
+        $friendship = Friendship::firstOrNewFriendship($this, $recipient)
             ->fill([
             'status' => Status::PENDING,
         ]);
@@ -104,7 +104,7 @@ trait Friendable
         //if there is a friendship between two models delete it
         $this->removeFriendshipsWith($recipient);
 
-        $friendship = Friendship::firstOrNewRecipient($recipient)
+        $friendship = Friendship::firstOrNewFriendship($this, $recipient)
             ->fill([
                 'status' => Status::BLOCKED,
             ]);

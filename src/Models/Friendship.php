@@ -56,11 +56,14 @@ class Friendship extends Model
 
     /**
      * @param Model $recipient
+     * @param Model $sender
      * @return Friendship
      */
-    public static function firstOrNewRecipient($recipient)
+    public static function firstOrNewFriendship($sender, $recipient)
     {
         return self::firstOrNew([
+            'sender_id'      => $sender->getKey(),
+            'sender_type'    => $sender->getMorphClass(),
             'recipient_id'   => $recipient->getKey(),
             'recipient_type' => $recipient->getMorphClass(),
         ]);
