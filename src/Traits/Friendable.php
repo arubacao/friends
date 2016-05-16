@@ -6,7 +6,6 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
  */
 namespace Arubacao\Friendships\Traits;
 
@@ -39,11 +38,11 @@ trait Friendable
         $previouslyDeniedFriendship = $this->findFriendshipsWith($recipient)
             ->whereStatus(Status::DENIED)
             ->whereSender($recipient);
-        if($previouslyDeniedFriendship->exists())
-        {
+        if ($previouslyDeniedFriendship->exists()) {
             $previouslyDeniedFriendship->update([
-                'status' => Status::ACCEPTED
+                'status' => Status::ACCEPTED,
             ]);
+
             return $previouslyDeniedFriendship;
         }
 
