@@ -28,7 +28,6 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
         $this->assertCount(1, $recipient->getReceivingPendingFriendships());
     }
 
-
     /** @test */
     public function see_friend_request_in_database()
     {
@@ -191,5 +190,20 @@ class RequestFriendshipsTest extends \Arubacao\Tests\Friendships\AbstractTestCas
 
         $this->assertFalse($recipient->isBlockedBy($sender));
         $this->assertFalse($sender->hasBlocked($recipient));
+    }
+
+    /** @test */
+    public function a_previously_denied_friendship_request_gets_accepted_on_friendship_request() {
+        $sender = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
+        $recipient = factory(Arubacao\Tests\Friendships\Models\User::class)->create();
+
+        $sender->sendFriendshipRequestTo($recipient);
+        $this->assertTrue($recipient->hasFriendshipRequestFrom($sender));
+        $recipient->denyFriendshipRequestFrom($sender);
+        $this->assertFalse($recipient->hasFriendshipRequestFrom($sender));
+        $recipient->sendFriendshipRequestTo($sender);
+        $this->assertFalse($sender->hasFriendshipRequestFrom($recipient));
+        $this->assertCount(1, $sender->getAcceptedFriendships());
+        $this->assertCount(1, $recipient->getAcceptedFriendships());
     }
 }
