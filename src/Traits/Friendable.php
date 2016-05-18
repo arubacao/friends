@@ -7,7 +7,6 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
  */
 namespace Arubacao\Friendships\Traits;
 
@@ -33,7 +32,7 @@ trait Friendable
     public function sendFriendshipRequestTo(Model $recipient)
     {
         // Cannot send to himself
-        if($recipient == $this) {
+        if ($recipient == $this) {
             return false;
         }
 
@@ -41,7 +40,7 @@ trait Friendable
         $friendship = $this->getFriendshipWith($recipient);
 
         // If a Friendship already exists
-        if($friendship) {
+        if ($friendship) {
             return $this->handleExistingFriendship($friendship, $recipient);
         }
 
@@ -63,22 +62,23 @@ trait Friendable
     private function handleExistingFriendship(Friendship $friendship, Model $recipient)
     {
         // Accepted Friendship
-        if($friendship->status == Status::ACCEPTED) {
+        if ($friendship->status == Status::ACCEPTED) {
             return $friendship;
         }
         // Pending Friendship
-        if($friendship->status == Status::PENDING) {
-            if($this->getKey() == $friendship->recipient_id) {
+        if ($friendship->status == Status::PENDING) {
+            if ($this->getKey() == $friendship->recipient_id) {
                 // $this sends a friendship request to a $recipient that already send one
                 // Update Friendship to accepted
                 $friendship->update(['status' => Status::ACCEPTED]);
-                /** @todo: fire accepted event */
+                /* @todo: fire accepted event */
             }
+
             return $friendship;
         }
         // Denied Friendship
-        if($friendship->status == Status::DENIED) {
-            if($recipient->getKey() == $friendship->recipient_id) {
+        if ($friendship->status == Status::DENIED) {
+            if ($recipient->getKey() == $friendship->recipient_id) {
                 // $this retries previously denied attempt
                 $friendship->update(['status' => Status::PENDING]);
             } else {
@@ -88,15 +88,15 @@ trait Friendable
                     'sender_type'    => $this->getMorphClass(),
                     'recipient_id'   => $recipient->getKey(),
                     'recipient_type' => $recipient->getMorphClass(),
-                    'status' => Status::PENDING
+                    'status' => Status::PENDING,
                 ]);
             }
-            /** @todo: fire request event */
+            /* @todo: fire request event */
             return $friendship;
         }
         // Blocked Friendship
-        if($friendship->status == Status::BLOCKED) {
-            if($this->getKey() == $friendship->recipient_id) {
+        if ($friendship->status == Status::BLOCKED) {
+            if ($this->getKey() == $friendship->recipient_id) {
                 // $this is blocked by $recipient
                 return false;
             }
@@ -108,9 +108,9 @@ trait Friendable
                 'sender_type'    => $this->getMorphClass(),
                 'recipient_id'   => $recipient->getKey(),
                 'recipient_type' => $recipient->getMorphClass(),
-                'status' => Status::PENDING
+                'status' => Status::PENDING,
             ]);
-            /** @todo: fire request event */
+            /* @todo: fire request event */
             return $friendship;
         }
     }
@@ -180,6 +180,7 @@ trait Friendable
             ]);
 
         $this->friendships()->save($friendship);
+
         return $friendship;
     }
 
