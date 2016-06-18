@@ -37,14 +37,34 @@ trait Friendable
             },
         ])
             ->where('id', '=', $this->getKey())
-            ->first();
+            ->get();
 
         $friends = collect([]);
-        $friends->push($me->friends_sender);
-        $friends->push($me->friends_recipient);
+        $friends->push($me->friendship_sender);
+        $friends->push($me->friendship_recipient);
         $friends = $friends->flatten();
 
         return $friends;
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function any_friends()
+    {
+        $me = $this->with([
+            'friendship_sender',
+            'friendship_recipient',
+        ])
+            ->where('id', '=', $this->getKey())
+            ->first();
+
+        $any_friends = collect([]);
+        $any_friends->push($me->friendship_sender);
+        $any_friends->push($me->friendship_recipient);
+        $any_friends = $any_friends->flatten();
+
+        return $any_friends;
     }
 
     /**

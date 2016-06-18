@@ -24,6 +24,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $recipient = factory(User::class)->create();
 
         $sender->sendFriendRequest($recipient);
+
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
@@ -34,6 +35,22 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
             'sender_id' => $recipient->id,
             'status' => Status::PENDING,
         ]);
+        $this->assertCount(1, $sender->any_friends());
+        $this->assertCount(1, $recipient->any_friends());
+    }
+
+    /**
+     * @test
+     */
+    public function user_model_reloads_after_friend_request() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+
+        $array = $sender->toArray();
+
+        $this->assertCount(1, $array["friendship_sender"]);
     }
 
     /**
