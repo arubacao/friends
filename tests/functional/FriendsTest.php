@@ -97,6 +97,41 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $this->assertCount(1, $recipient->friends());
     }
 
+    /**
+     * @test
+     */
+    public function a_user_is_friend_with_a_user_after_a_friend_request() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+        $recipient->acceptFriendRequest($sender);
+
+        $this->assertTrue($sender->isFriendWith($recipient));
+        $this->assertTrue($recipient->isFriendWith($sender));
+    }
+
+    /**
+     * @test
+     */
+    public function a_user_can_deny_a_friend_request() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+        $recipient->denyFriendRequest($sender);
+
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $sender->id,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'recipient_id' => $recipient->id,
+        ]);
+
+        $this->assertCount(0, $sender->any_friends());
+        $this->assertCount(0, $recipient->any_friends());
+    }
+
 
     /**
      * @test

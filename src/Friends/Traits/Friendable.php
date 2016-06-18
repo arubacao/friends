@@ -103,6 +103,8 @@ trait Friendable
             return false;
         }
 
+
+
         $this->friends_i_am_sender()->attach($userId, [
             'status' => Status::PENDING,
         ]);
@@ -183,6 +185,33 @@ trait Friendable
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param int|self $user
+     * @return bool
+     */
+    public function isFriendWith($user) {
+        $userId = $this->retrieveUserId($user);
+
+        $result = $this->with([
+            'friends_i_am_sender' => function ($query) use ($userId) {
+                $query->where('status', Status::ACCEPTED)
+                    ->where('id', $userId)
+                    ->first()
+                ;
+            },
+            'friends_i_am_recipient' => function ($query) use ($userId) {
+                $query->where('status', Status::ACCEPTED)
+                    ->where('id', $userId)
+                    ->first()
+                ;
+            },
+        ])
+            ->where('id', '=', $this->getKey())
+            ->first();
+
+        return $result ? true : false;
     }
 
     /**
