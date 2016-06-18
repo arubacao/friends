@@ -8,8 +8,16 @@
  * file that was distributed with this source code.
  */
 
-$factory->define(Arubacao\Tests\Friends\Models\User::class, function (Faker\Generator $faker) {
-    return [
-        'name' => $faker->name,
-    ];
-});
+namespace Arubacao\Friends;
+
+/**
+ * Class Status.
+ * @package Arubacao\Friends
+ */
+class Status
+{
+    const PENDING = 0;
+    const ACCEPTED = 1;
+    const DENIED = 2;
+    const BLOCKED = 3;
+}

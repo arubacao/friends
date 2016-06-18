@@ -8,8 +8,16 @@
  * file that was distributed with this source code.
  */
 
-$factory->define(Arubacao\Tests\Friends\Models\User::class, function (Faker\Generator $faker) {
-    return [
-        'name' => $faker->name,
-    ];
-});
+namespace Arubacao\Tests\Friends;
+
+
+class ExampleTest extends AbstractTestCase
+{
+    /**
+     * @test
+     */
+    public function testStuff()
+    {
+        $this->assertTrue(true);
+    }
+}
