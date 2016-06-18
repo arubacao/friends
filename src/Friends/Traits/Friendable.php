@@ -24,20 +24,18 @@ trait Friendable
     {
         $me = $this->with([
             'friendship_sender' => function ($query) {
-                $query->where('status', Status::PENDING)
-                    ->orderBy('updated_at', 'desc')
+                $query->where('status', Status::ACCEPTED)
                     ->first()
                 ;
             },
             'friendship_recipient' => function ($query) {
-                $query->where('status', Status::PENDING)
-                    ->orderBy('updated_at', 'desc')
+                $query->where('status', Status::ACCEPTED)
                     ->first()
                 ;
             },
         ])
             ->where('id', '=', $this->getKey())
-            ->get();
+            ->first();
 
         $friends = collect([]);
         $friends->push($me->friendship_sender);
@@ -80,7 +78,8 @@ trait Friendable
             ->withPivot([
                 'status',
                 'deleted_at',
-            ]);
+            ])
+            ->orderBy('updated_at', 'desc');
     }
 
     /**
@@ -96,7 +95,8 @@ trait Friendable
             ->withPivot([
                 'status',
                 'deleted_at',
-            ]);
+            ])
+            ->orderBy('updated_at', 'desc');
     }
 
     /**
@@ -114,10 +114,34 @@ trait Friendable
         ]);
 
         // Reload relation
-        $this->load('friendship_sender');
+        $this->load('friendship_sender', 'friendship_recipient');
 
         return $this;
     }
+
+    /**
+     * @param $user
+     * @return $this|bool
+     */
+    public function acceptFriendRequest($user)
+    {
+        $userId = $this->retrieveUserId($user);
+
+        $relationship = $this->friendship_recipient()
+            ->wherePivot('status', Status::PENDING)
+            ->wherePivot('sender_id', $userId)
+            ->first();
+
+        if( ! is_null($relationship)) {
+            $relationship->pivot->status = Status::ACCEPTED;
+            $relationship->pivot->save();
+            // Reload relation
+            $this->load('friendship_recipient', 'friendship_sender');
+            return $this;
+        }
+        return false;
+    }
+
 
     /**
      * @param $user
