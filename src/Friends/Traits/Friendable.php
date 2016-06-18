@@ -102,42 +102,57 @@ trait Friendable
     /**
      * Alias to eloquent many-to-many relation's attach() method.
      *
-     * @param int|User $user
-     * @return $this
+     * @param int|self $user
+     * @return bool
      */
     public function sendFriendRequest($user)
     {
         $userId = $this->retrieveUserId($user);
 
+        if($userId === $this->id) {
+            return false;
+        }
+
         $this->friendship_sender()->attach($userId, [
             'status' => Status::PENDING,
         ]);
 
-        // Reload relation
-        $this->load('friendship_sender', 'friendship_recipient');
-
-        return $this;
+        return true;
     }
 
     /**
-     * @param $user
-     * @return $this|bool
+     * @param int|self $user
+     * @return bool
      */
     public function acceptFriendRequest($user)
     {
         $userId = $this->retrieveUserId($user);
 
-        $relationship = $this->friendship_recipient()
-            ->wherePivot('status', Status::PENDING)
-            ->wherePivot('sender_id', $userId)
-            ->first();
+        $relationship = $this->getPendingRequest($userId);
 
         if( ! is_null($relationship)) {
             $relationship->pivot->status = Status::ACCEPTED;
             $relationship->pivot->save();
-            // Reload relation
-            $this->load('friendship_recipient', 'friendship_sender');
-            return $this;
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param int|self $user
+     * @return bool
+     */
+    public function denyFriendRequest($user)
+    {
+        $userId = $this->retrieveUserId($user);
+
+        $relationship = $this->getPendingRequest($userId);
+
+        if( ! is_null($relationship)) {
+            $relationship->pivot->delete();
+
+            return true;
         }
         return false;
     }
@@ -157,5 +172,32 @@ trait Friendable
         }
 
         return $user;
+    }
+
+    /**
+     * @param int|self $user
+     * @return bool
+     */
+    public function hasPendingRequestFrom($user) {
+        $userId = $this->retrieveUserId($user);
+
+        $relationship = $this->getPendingRequest($userId);
+
+        if( ! is_null($relationship)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param int $userId
+     * @return mixed
+     */
+    private function getPendingRequest($userId)
+    {
+        return $this->friendship_recipient()
+            ->wherePivot('status', Status::PENDING)
+            ->wherePivot('sender_id', $userId)
+            ->first();
     }
 }

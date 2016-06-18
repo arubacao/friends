@@ -37,6 +37,8 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         ]);
         $this->assertCount(1, $sender->any_friends());
         $this->assertCount(1, $recipient->any_friends());
+        $this->assertTrue($recipient->hasPendingRequestFrom($sender));
+        $this->assertFalse($sender->hasPendingRequestFrom($recipient));
     }
 
     /**
@@ -50,6 +52,24 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
 
         $this->assertCount(0, $sender->friends());
         $this->assertCount(0, $recipient->friends());
+    }
+
+    /**
+     * @test
+     */
+    public function a_user_can_not_send_a_user_a_friend_request_to_himself() {
+        $sender = factory(User::class)->create();
+
+        $bool = $sender->sendFriendRequest($sender);
+
+        $this->assertFalse($bool);
+        $this->dontSeeInDatabase('friends', [
+            'recipient_id' => $sender->id,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $sender->id,
+        ]);
+        $this->assertCount(0, $sender->any_friends());
     }
 
     /**
@@ -77,20 +97,6 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $this->assertCount(1, $recipient->friends());
     }
 
-    /**
-     * @test
-     */
-    public function user_model_reloads_after_accepting_friend_request() {
-        $sender = factory(User::class)->create();
-        $recipient = factory(User::class)->create();
-
-        $sender->sendFriendRequest($recipient);
-        $recipient->sendFriendRequest($sender);
-
-        $array = $recipient->toArray();
-        dd($array);
-        $this->assertCount(1, $array["friendship_recipient"]);
-    }
 
     /**
      * @test
@@ -116,39 +122,4 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $this->assertCount(0, $recipient->any_friends());
     }
 
-    /**
-     * @test
-     */
-    public function user_model_reloads_after_friend_request() {
-        $sender = factory(User::class)->create();
-        $recipient = factory(User::class)->create();
-
-        $sender->sendFriendRequest($recipient);
-
-        $array = $sender->toArray();
-
-        $this->assertCount(1, $array["friendship_sender"]);
-    }
-
-    /**
-     * @test
-     */
-    public function worker(){
-        $sender = factory(User::class)->create();
-        $sender2 = factory(User::class)->create();
-        $recipient = factory(User::class)->create();
-
-        $sender->sendFriendRequest($recipient);
-        $sender2->sendFriendRequest($recipient);
-
-        echo 'Sender: '.$sender->name.PHP_EOL;
-        echo 'Sender2: '.$sender2->name.PHP_EOL;
-        echo 'Recipient: '.$recipient->name.PHP_EOL;
-
-//        dd($recipient->friends()->get());
-        $u = $sender->friends()->get();
-        foreach ($u as $friend) {
-            echo "Friend: " . $friend->name.PHP_EOL;
-        }
-    }
 }
