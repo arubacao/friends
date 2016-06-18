@@ -17,25 +17,40 @@ use Illuminate\Support\Facades\DB;
 trait Friendable
 {
 
-    public function scopeFriends($query)
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function friends()
     {
-        $query->with([
-            'friends_sender' => function ($query) {
-                $query->where('status', Status::PENDING);
-
+        $me = $this->with([
+            'friendship_sender' => function ($query) {
+                $query->where('status', Status::PENDING)
+                    ->orderBy('updated_at', 'desc')
+                    ->first()
+                ;
             },
-            'friends_recipient' => function ($query) {
-                $query->where('status', Status::PENDING);
-
+            'friendship_recipient' => function ($query) {
+                $query->where('status', Status::PENDING)
+                    ->orderBy('updated_at', 'desc')
+                    ->first()
+                ;
             },
         ])
-            ->where('id', '!=', $this->getKey());
+            ->where('id', '=', $this->getKey())
+            ->first();
+
+        $friends = collect([]);
+        $friends->push($me->friends_sender);
+        $friends->push($me->friends_recipient);
+        $friends = $friends->flatten();
+
+        return $friends;
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function friends_sender()
+    public function friendship_sender()
     {
         return $this->belongsToMany(
             self::class,
@@ -51,7 +66,7 @@ trait Friendable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function friends_recipient()
+    public function friendship_recipient()
     {
         return $this->belongsToMany(
             self::class,
@@ -74,9 +89,12 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
-        $this->friends_sender()->attach($userId, [
+        $this->friendship_sender()->attach($userId, [
             'status' => Status::PENDING,
         ]);
+
+        // Reload relation
+        $this->load('friendship_sender');
 
         return $this;
     }
