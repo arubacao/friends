@@ -11,8 +11,6 @@
 namespace Arubacao\Friends\Traits;
 
 use Arubacao\Friends\Status;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 
 trait Friendable
 {
@@ -23,12 +21,12 @@ trait Friendable
     public function friends()
     {
         $me = $this->with([
-            'friendship_sender' => function ($query) {
+            'friends_i_am_sender' => function ($query) {
                 $query->where('status', Status::ACCEPTED)
                     ->first()
                 ;
             },
-            'friendship_recipient' => function ($query) {
+            'friends_i_am_recipient' => function ($query) {
                 $query->where('status', Status::ACCEPTED)
                     ->first()
                 ;
@@ -37,10 +35,7 @@ trait Friendable
             ->where('id', '=', $this->getKey())
             ->first();
 
-        $friends = collect([]);
-        $friends->push($me->friendship_sender);
-        $friends->push($me->friendship_recipient);
-        $friends = $friends->flatten();
+        $friends = $this->mergedFriends($me);
 
         return $friends;
     }
@@ -51,16 +46,13 @@ trait Friendable
     public function any_friends()
     {
         $me = $this->with([
-            'friendship_sender',
-            'friendship_recipient',
+            'friends_i_am_sender',
+            'friends_i_am_recipient',
         ])
             ->where('id', '=', $this->getKey())
             ->first();
 
-        $any_friends = collect([]);
-        $any_friends->push($me->friendship_sender);
-        $any_friends->push($me->friendship_recipient);
-        $any_friends = $any_friends->flatten();
+        $any_friends = $this->mergedFriends($me);
 
         return $any_friends;
     }
@@ -68,7 +60,7 @@ trait Friendable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function friendship_sender()
+    public function friends_i_am_sender()
     {
         return $this->belongsToMany(
             self::class,
@@ -85,7 +77,7 @@ trait Friendable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function friendship_recipient()
+    public function friends_i_am_recipient()
     {
         return $this->belongsToMany(
             self::class,
@@ -113,7 +105,7 @@ trait Friendable
             return false;
         }
 
-        $this->friendship_sender()->attach($userId, [
+        $this->friends_i_am_sender()->attach($userId, [
             'status' => Status::PENDING,
         ]);
 
@@ -201,7 +193,7 @@ trait Friendable
      */
     private function getPendingRequest($userId)
     {
-        return $this->friendship_recipient()
+        return $this->friends_i_am_recipient()
             ->wherePivot('status', Status::PENDING)
             ->wherePivot('sender_id', $userId)
             ->first();
@@ -209,6 +201,19 @@ trait Friendable
 
     private function reload()
     {
-        $this->load('friendship_recipient', 'friendship_sender');
+        $this->load('friends_i_am_recipient', 'friends_i_am_sender');
+    }
+
+    /**
+     * @param $me
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    private function mergedFriends($me)
+    {
+        $friends = collect([]);
+        $friends->push($me->friends_i_am_sender);
+        $friends->push($me->friends_i_am_recipient);
+        $friends = $friends->flatten();
+        return $friends;
     }
 }
