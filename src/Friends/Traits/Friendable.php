@@ -69,7 +69,6 @@ trait Friendable
             ->withTimestamps()
             ->withPivot([
                 'status',
-                'deleted_at',
             ])
             ->orderBy('updated_at', 'desc');
     }
@@ -86,7 +85,6 @@ trait Friendable
             ->withTimestamps()
             ->withPivot([
                 'status',
-                'deleted_at',
             ])
             ->orderBy('updated_at', 'desc');
     }

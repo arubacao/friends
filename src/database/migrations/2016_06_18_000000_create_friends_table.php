@@ -34,7 +34,6 @@ class CreateFriendsTable extends Migration
                 ->onDelete( 'cascade' );
             $table->tinyInteger( 'status' )->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
