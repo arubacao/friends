@@ -120,11 +120,11 @@ class Friendship extends Model
     public function scopeAllMyFriendships($query, $model)
     {
         return $query->where(function ($query) use ($model) {
-                $query->where(function ($q) use ($model) {
-                    $q->whereSender($model);
-                })->orWhere(function ($q) use ($model) {
-                    $q->whereRecipient($model);
-                });
+            $query->where(function ($q) use ($model) {
+                $q->whereSender($model);
+            })->orWhere(function ($q) use ($model) {
+                $q->whereRecipient($model);
             });
+        });
     }
 }
