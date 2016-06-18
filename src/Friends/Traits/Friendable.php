@@ -117,6 +117,8 @@ trait Friendable
             'status' => Status::PENDING,
         ]);
 
+        $this->reload();
+
         return true;
     }
 
@@ -133,6 +135,8 @@ trait Friendable
         if( ! is_null($relationship)) {
             $relationship->pivot->status = Status::ACCEPTED;
             $relationship->pivot->save();
+
+            $this->reload();
 
             return true;
         }
@@ -151,6 +155,8 @@ trait Friendable
 
         if( ! is_null($relationship)) {
             $relationship->pivot->delete();
+
+            $this->reload();
 
             return true;
         }
@@ -199,5 +205,10 @@ trait Friendable
             ->wherePivot('status', Status::PENDING)
             ->wherePivot('sender_id', $userId)
             ->first();
+    }
+
+    private function reload()
+    {
+        $this->load('friendship_recipient', 'friendship_sender');
     }
 }
