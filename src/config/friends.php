@@ -11,10 +11,10 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Auth Model
+    | Applications User Model
     |--------------------------------------------------------------------------
     |
-    | This is the Auth model used by Friends.
+    | This is the applications `User` model used by Friends.
     |
     */
     'user_model' => App\User::class,
@@ -24,7 +24,7 @@ return [
     | Applications users Table
     |--------------------------------------------------------------------------
     |
-    | This is the users table name used by Friends.
+    | This is the applications `users` table name used by Friends.
     |
     */
     'users_table' => 'users',
