@@ -14,6 +14,37 @@ use Arubacao\Friends\Status;
 
 trait Friendable
 {
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function friends_i_am_sender()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'friends',
+            'sender_id', 'recipient_id')
+            ->withTimestamps()
+            ->withPivot([
+                'status',
+            ])
+            ->orderBy('updated_at', 'desc');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function friends_i_am_recipient()
+    {
+        return $this->belongsToMany(
+            self::class,
+            'friends',
+            'recipient_id', 'sender_id')
+            ->withTimestamps()
+            ->withPivot([
+                'status',
+            ])
+            ->orderBy('updated_at', 'desc');
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Collection
@@ -58,38 +89,6 @@ trait Friendable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function friends_i_am_sender()
-    {
-        return $this->belongsToMany(
-            self::class,
-            'friends',
-            'sender_id', 'recipient_id')
-            ->withTimestamps()
-            ->withPivot([
-                'status',
-            ])
-            ->orderBy('updated_at', 'desc');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function friends_i_am_recipient()
-    {
-        return $this->belongsToMany(
-            self::class,
-            'friends',
-            'recipient_id', 'sender_id')
-            ->withTimestamps()
-            ->withPivot([
-                'status',
-            ])
-            ->orderBy('updated_at', 'desc');
-    }
-
-    /**
      * Alias to eloquent many-to-many relation's attach() method.
      *
      * @param int|self $user
@@ -103,7 +102,14 @@ trait Friendable
             return false;
         }
 
-
+        if($this->hasRelationshipWith($userId, [
+            Status::PENDING,
+            Status::ACCEPTED
+        ])) {
+            return false;
+        }
+        
+        /** @todo: accept friend request if there is a friend request from user pending */
 
         $this->friends_i_am_sender()->attach($userId, [
             'status' => Status::PENDING,
@@ -155,25 +161,42 @@ trait Friendable
         return false;
     }
 
+    /**
+     * @param int|self $user
+     * @return bool
+     */
+    public function deleteFriend($user) {
+        $userId = $this->retrieveUserId($user);
+
+        if($userId === $this->id) {
+            return false;
+        }
+
+        while($relationship = $this->getRelationshipWith($userId, [Status::ACCEPTED, Status::PENDING])) {
+            $relationship->pivot->delete();
+        }
+        return true;
+    }
+
 
     /**
-     * @param $user
-     * @return mixed
+     * @param int|array|self $user
+     * @return int|null
      */
     protected function retrieveUserId($user)
     {
         if (is_object($user)) {
-            $user = $user->getKey();
+            return $user->getKey();
         }
         if (is_array($user) && isset($user[ 'id' ])) {
-            $user = $user[ 'id' ];
+            return $user[ 'id' ];
         }
 
         return $user;
     }
 
     /**
-     * @param int|self $user
+     * @param int|array|self $user
      * @return bool
      */
     public function hasPendingRequestFrom($user) {
@@ -188,30 +211,57 @@ trait Friendable
     }
 
     /**
-     * @param int|self $user
+     * @param int|array|self $user
      * @return bool
      */
     public function isFriendWith($user) {
         $userId = $this->retrieveUserId($user);
 
-        $result = $this->with([
-            'friends_i_am_sender' => function ($query) use ($userId) {
-                $query->where('status', Status::ACCEPTED)
-                    ->where('id', $userId)
-                    ->first()
-                ;
-            },
-            'friends_i_am_recipient' => function ($query) use ($userId) {
-                $query->where('status', Status::ACCEPTED)
-                    ->where('id', $userId)
-                    ->first()
-                ;
-            },
-        ])
-            ->where('id', '=', $this->getKey())
+        return $this->hasRelationshipWith($userId, [Status::ACCEPTED]);
+    }
+
+    /**
+     * @param int|array|self $user
+     * @param array $status
+     * @return bool
+     */
+    public function hasRelationshipWith($user, $status) {
+        $userId = $this->retrieveUserId($user);
+
+        $relationship = $this->getRelationshipWith($userId, $status);
+
+        return (is_null($relationship)) ? false : true;
+
+    }
+
+    /**
+     * @param int|array|self $user
+     * @param array $status
+     * @return bool
+     */
+    public function getRelationshipWith($user, $status) {
+        $userId = $this->retrieveUserId($user);
+
+        $attempt1 = $this->friends_i_am_recipient()
+            ->wherePivotIn('status', $status)
+            ->wherePivot('sender_id', $userId)
             ->first();
 
-        return $result ? true : false;
+        if ( ! is_null($attempt1) ){
+            return $attempt1;
+        }
+
+        $attempt2 = $this->friends_i_am_sender()
+            ->wherePivotIn('status', $status)
+            ->wherePivot('recipient_id', $userId)
+            ->first();
+
+        if ( ! is_null($attempt2) ){
+            return $attempt2;
+        }
+
+        return null;
+
     }
 
     /**
@@ -226,13 +276,16 @@ trait Friendable
             ->first();
     }
 
+    /**
+     * Eager load relations on the model.
+     */
     private function reload()
     {
         $this->load('friends_i_am_recipient', 'friends_i_am_sender');
     }
 
     /**
-     * @param $me
+     * @param self $me
      * @return \Illuminate\Database\Eloquent\Collection
      */
     private function mergedFriends($me)

@@ -44,6 +44,118 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
     /**
      * @test
      */
+    public function a_user_can_only_send_one_friend_request_to_a_user() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+        $sender->sendFriendRequest($recipient);
+        $sender->sendFriendRequest($recipient);
+        $sender->sendFriendRequest($recipient);
+
+        $this->seeInDatabase('friends', [
+            'sender_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'status' => Status::PENDING,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'recipient_id' => $sender->id,
+            'sender_id' => $recipient->id,
+            'status' => Status::PENDING,
+        ]);
+        $this->assertCount(1, $sender->any_friends());
+        $this->assertCount(1, $recipient->any_friends());
+        $this->assertTrue($recipient->hasPendingRequestFrom($sender));
+        $this->assertFalse($sender->hasPendingRequestFrom($recipient));
+    }
+
+    /**
+     * @test
+     */
+    public function a_user_can_not_send_a_friend_request_to_a_friend() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+        $recipient->acceptFriendRequest($sender);
+        $sender->sendFriendRequest($recipient);
+
+        $this->seeInDatabase('friends', [
+            'sender_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'status' => Status::ACCEPTED,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'status' => Status::PENDING,
+        ]);
+        $this->assertCount(1, $sender->any_friends());
+        $this->assertCount(1, $sender->friends());
+        $this->assertCount(1, $recipient->any_friends());
+        $this->assertCount(1, $recipient->friends());
+        $this->assertFalse($recipient->hasPendingRequestFrom($sender));
+        $this->assertFalse($sender->hasPendingRequestFrom($recipient));
+    }
+
+    /**
+     * @test
+     */
+    public function a_user_can_not_send_a_friend_request_to_a_friend_2() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+        $recipient->acceptFriendRequest($sender);
+        $recipient->sendFriendRequest($sender);
+
+        $this->seeInDatabase('friends', [
+            'sender_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'status' => Status::ACCEPTED,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'status' => Status::PENDING,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $recipient->id,
+            'recipient_id' => $sender->id,
+            'status' => Status::PENDING,
+        ]);
+        $this->assertCount(1, $sender->any_friends());
+        $this->assertCount(1, $sender->friends());
+        $this->assertCount(1, $recipient->any_friends());
+        $this->assertCount(1, $recipient->friends());
+        $this->assertFalse($recipient->hasPendingRequestFrom($sender));
+        $this->assertFalse($sender->hasPendingRequestFrom($recipient));
+    }
+
+
+    /**
+     * @test
+     */
+    public function a_user_can_delete_a_friend() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+        $recipient->acceptFriendRequest($sender);
+        $sender->deleteFriend($recipient);
+
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $sender->id,
+        ]);
+        $this->assertCount(0, $sender->any_friends());
+        $this->assertCount(0, $recipient->any_friends());
+        $this->assertFalse($recipient->isFriendWith($sender));
+        $this->assertFalse($sender->isFriendWith($recipient));
+    }
+
+    /**
+     * @test
+     */
     public function friends_is_empty_after_friend_request() {
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
