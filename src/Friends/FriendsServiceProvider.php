@@ -48,13 +48,19 @@ class FriendsServiceProvider extends ServiceProvider
      */
     protected function publishMigration()
     {
-        $published_migration = glob( database_path( '/migrations/*_create_friends_table.php' ) );
-        if( count( $published_migration ) === 0 )
-        {
-            $this->publishes( [
-                __DIR__ . '/../database/migrations/2016_06_18_000000_create_friends_table.php' => database_path( '/migrations/' . date( 'Y_m_d_His' ) . '_create_friends_table.php' ),
-            ], 'migrations' );
+        if (class_exists('CreateFriendshipsTable')) {
+            return;
         }
+
+        $published_migration = glob( database_path( '/migrations/*_create_friends_table.php' ) );
+        if ( count( $published_migration ) != 0 )
+        {
+            return;
+        }
+
+        $stub = __DIR__ . '/../database/migrations/2016_06_18_000000_create_friends_table.php';
+        $target = database_path( '/migrations/' . date( 'Y_m_d_His' ) . '_create_friends_table.php' );
+        $this->publishes([ $stub => $target ], 'migrations' );
     }
 
     /**
