@@ -48,7 +48,7 @@ class FriendsServiceProvider extends ServiceProvider
      */
     protected function publishMigration()
     {
-        if (class_exists('CreateFriendshipsTable')) {
+        if (class_exists('CreateFriendsTable')) {
             return;
         }
 
