@@ -13,8 +13,6 @@ use Arubacao\Tests\Friends\Models\User;
 
 class UnitTest extends \Arubacao\Tests\Friends\AbstractTestCase
 {
-//    use \Illuminate\Foundation\Testing\DatabaseTransactions;
-//    use \Illuminate\Foundation\Testing\DatabaseMigrations;
 
     /**
      * @test
@@ -28,7 +26,16 @@ class UnitTest extends \Arubacao\Tests\Friends\AbstractTestCase
     /**
      * @test
      */
-    public function retrieveUserId_returns_user_id_for_user_id(){
+    public function retrieveUserId_returns_user_id_for_user_array(){
+        $sender = factory(User::class)->create();
+        $id = $this->invokeMethod($sender, 'retrieveUserId', [$sender->toArray()]);
+        $this->assertEquals($sender->id, $id);
+    }
+
+    /**
+     * @test
+     */
+    public function retrieveUserId_returns_user_id_for_user_id_integer(){
         $sender = factory(User::class)->create();
         $id = $this->invokeMethod($sender, 'retrieveUserId', [$sender->id]);
         $this->assertEquals($sender->id, $id);
