@@ -54,12 +54,12 @@ trait Friendable
         $me = $this->with([
             'friends_i_am_sender' => function ($query) {
                 $query->where('status', Status::ACCEPTED)
-                    ->first()
+                    ->get()
                 ;
             },
             'friends_i_am_recipient' => function ($query) {
                 $query->where('status', Status::ACCEPTED)
-                    ->first()
+                    ->get()
                 ;
             },
         ])
@@ -69,6 +69,24 @@ trait Friendable
         $friends = $this->mergedFriends($me);
 
         return $friends;
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function incoming_friends()
+    {
+        $me = $this->with([
+            'friends_i_am_recipient' => function ($query) {
+                $query->where('status', Status::PENDING)
+                    ->get()
+                ;
+            },
+        ])
+            ->where('id', '=', $this->getKey())
+            ->first();
+
+        return $me->friends_i_am_recipient;
     }
 
     /**
@@ -99,7 +117,7 @@ trait Friendable
         $userId = $this->retrieveUserId($user);
 
         if($userId == $this->getKey()) {
-            // Not allowed to send a friend request to self.
+            // Method not allowed on self
             return false;
         }
 
@@ -145,12 +163,17 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
+        if($userId == $this->getKey()) {
+            // Method not allowed on self
+            return false;
+        }
+
         $relationship = $this->getPendingRequest($userId);
 
         if( ! is_null($relationship)) {
             $relationship->pivot->status = Status::ACCEPTED;
             $relationship->pivot->save();
-
+            /** @todo: fire event friend request accepted */
             $this->reload();
 
             return true;
@@ -166,11 +189,16 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
+        if($userId == $this->getKey()) {
+            // Method not allowed on self
+            return false;
+        }
+
         $relationship = $this->getPendingRequest($userId);
 
         if( ! is_null($relationship)) {
             $relationship->pivot->delete();
-
+            /** @todo: fire event friend request denied */
             $this->reload();
 
             return true;
@@ -186,30 +214,19 @@ trait Friendable
         $userId = $this->retrieveUserId($user);
 
         if($userId == $this->getKey()) {
+            // Method not allowed on self
             return false;
         }
 
-        while($relationship = $this->getRelationshipWith($userId, [Status::ACCEPTED, Status::PENDING])) {
+        while($relationship = $this->getRelationshipWith($userId, [
+            Status::ACCEPTED,
+            Status::PENDING
+        ])) {
             $relationship->pivot->delete();
+            /** @todo: fire event friend deleted */
         }
+        $this->reload();
         return true;
-    }
-
-
-    /**
-     * @param int|array|self $user
-     * @return int|null
-     */
-    protected function retrieveUserId($user)
-    {
-        if (is_object($user)) {
-            return $user->getKey();
-        }
-        if (is_array($user) && isset($user[ 'id' ])) {
-            return $user[ 'id' ];
-        }
-
-        return $user;
     }
 
     /**
@@ -218,6 +235,11 @@ trait Friendable
      */
     public function hasPendingRequestFrom($user) {
         $userId = $this->retrieveUserId($user);
+
+        if($userId == $this->getKey()) {
+            // Method not allowed on self
+            return false;
+        }
 
         $relationship = $this->getPendingRequest($userId);
 
@@ -254,10 +276,15 @@ trait Friendable
     /**
      * @param int|array|self $user
      * @param array $status
-     * @return bool
+     * @return mixed
      */
     public function getRelationshipWith($user, $status) {
         $userId = $this->retrieveUserId($user);
+
+        if($userId == $this->getKey()) {
+            // Method not allowed on self
+            return null;
+        }
 
         $attempt1 = $this->friends_i_am_recipient()
             ->wherePivotIn('status', $status)
@@ -278,7 +305,22 @@ trait Friendable
         }
 
         return null;
+    }
 
+    /**
+     * @param int|array|self $user
+     * @return int|null
+     */
+    private function retrieveUserId($user)
+    {
+        if (is_object($user)) {
+            return $user->getKey();
+        }
+        if (is_array($user) && isset($user[ 'id' ])) {
+            return $user[ 'id' ];
+        }
+
+        return $user;
     }
 
     /**

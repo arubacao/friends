@@ -412,7 +412,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender->sendFriendRequest($recipient);
 
         $this->assertCount(1, $sender->any_friends());
-        $this->assertCount(2, $recipient->any_friends());
+        $this->assertCount(1, $recipient->any_friends());
     }
 
     /**
@@ -454,5 +454,36 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         }
 
         $this->assertCount(25, $sender->any_friends());
+    }
+
+    /**
+     * @test
+     */
+    public function incoming_friends_method_returns_1_user_after_friend_request() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+
+        $this->assertCount(0, $sender->incoming_friends());
+        $this->assertCount(1, $recipient->incoming_friends());
+    }
+
+    /**
+     * @test
+     */
+    public function incoming_friends_method_returns_correct_count_of_any_friends__50_requests_and_25_accepts() {
+        $recipient = factory(User::class)->create();
+        $senders = factory(User::class)->times(50)->create();
+
+        foreach ($senders as $key => $sender) {
+            $sender->sendFriendRequest($recipient);
+            if ($key % 2) {
+                $recipient->acceptFriendRequest($sender);
+                continue;
+            }
+        }
+
+        $this->assertCount(25, $recipient->incoming_friends());
     }
 }

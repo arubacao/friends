@@ -39,12 +39,11 @@ abstract class AbstractTestCase extends AbstractPackageTestCase
         
         $app['config']->set('friends.user_model', 'Arubacao\Tests\Friends\Models\User');
 
-        \Schema::create('users', function ($table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->timestamps();
-//            $table->softDeletes();
-        });
+//        \Schema::create('users', function ($table) {
+//            $table->increments('id');
+//            $table->string('name');
+//            $table->timestamps();
+//        });
     }
 
     /**
@@ -54,9 +53,9 @@ abstract class AbstractTestCase extends AbstractPackageTestCase
     {
         parent::setUp();
 
-//        $this->artisan('migrate', [
-//            '--realpath' => realpath(__DIR__.'/database/migrations'),
-//        ]);
+        $this->artisan('migrate', [
+            '--realpath' => realpath(__DIR__.'/database/migrations'),
+        ]);
 
         $this->artisan('migrate', [
             '--realpath' => realpath(__DIR__.'/../src/database/migrations'),
