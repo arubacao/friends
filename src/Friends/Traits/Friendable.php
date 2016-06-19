@@ -47,6 +47,27 @@ trait Friendable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIncludeRelationshipsWith($query, $user)
+    {
+        $userId = $this->retrieveUserId($user);
+
+        return $query->with([
+            'friends_i_am_sender' => function ($queryIn) use ($userId) {
+                $queryIn->where('recipient_id', $userId)
+                    ->get()
+                ;
+            },
+            'friends_i_am_recipient' => function ($queryIn) use ($userId) {
+                $queryIn->where('sender_id', $userId)
+                    ->get()
+                ;
+            },
+        ]);
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function friends()
