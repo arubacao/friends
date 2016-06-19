@@ -72,7 +72,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
     /**
      * @test
      */
-    public function a_user_can_not_send_a_friend_request_to_a_friend() {
+    public function a_user_can_not_send_a_new_friend_request_to_a_friend() {
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
@@ -101,7 +101,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
     /**
      * @test
      */
-    public function a_user_can_not_send_a_friend_request_to_a_friend_2() {
+    public function a_user_can_not_send_a_new_friend_request_to_a_friend_2() {
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
@@ -132,7 +132,6 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $this->assertFalse($sender->hasPendingRequestFrom($recipient));
     }
 
-
     /**
      * @test
      */
@@ -156,7 +155,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
     /**
      * @test
      */
-    public function friends_is_empty_after_friend_request() {
+    public function friends_method_returns_empty_array_after_friend_request() {
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
@@ -244,7 +243,6 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $this->assertCount(0, $recipient->any_friends());
     }
 
-
     /**
      * @test
      */
@@ -267,6 +265,36 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $this->assertCount(0, $recipient->friends());
         $this->assertCount(0, $sender->any_friends());
         $this->assertCount(0, $recipient->any_friends());
+    }
+
+    /**
+     * @test
+     */
+    public function a_friend_request_results_in_a_accepted_if_pending_request_is_available_from_recipient() {
+        $sender = factory(User::class)->create();
+        $recipient = factory(User::class)->create();
+
+        $sender->sendFriendRequest($recipient);
+        $recipient->sendFriendRequest($sender);
+
+        $this->seeInDatabase('friends', [
+            'sender_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'status' => Status::ACCEPTED,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'status' => Status::PENDING,
+        ]);
+        $this->dontSeeInDatabase('friends', [
+            'sender_id' => $recipient->id,
+            'recipient_id' => $sender->id,
+            'status' => Status::PENDING,
+        ]);
+
+        $this->assertCount(1, $sender->friends());
+        $this->assertCount(1, $recipient->friends());
     }
 
 }

@@ -98,22 +98,39 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
-        if($userId === $this->id) {
+        if($userId == $this->getKey()) {
+            // Not allowed to send a friend request to self.
             return false;
         }
 
-        if($this->hasRelationshipWith($userId, [
+        $relationship = $this->getRelationshipWith($userId, [
             Status::PENDING,
             Status::ACCEPTED
-        ])) {
+        ]);
+
+        if(! is_null($relationship)){
+            if ($relationship->pivot->status === Status::ACCEPTED) {
+                // Already friends
+                return false;
+            }
+            if ($relationship->pivot->status == Status::PENDING &&
+                $relationship->pivot->recipient_id == $this->getKey())
+            {
+                // Recipient already sent a friend request
+                // Accept pending friend request
+                $relationship->pivot->status = Status::ACCEPTED;
+                $relationship->pivot->save();
+                /** @todo: fire event friend request accepted */
+                $this->reload();
+                return true;
+            }
             return false;
         }
         
-        /** @todo: accept friend request if there is a friend request from user pending */
-
         $this->friends_i_am_sender()->attach($userId, [
             'status' => Status::PENDING,
         ]);
+        /** @todo: fire event friend request sent */
 
         $this->reload();
 
@@ -168,7 +185,7 @@ trait Friendable
     public function deleteFriend($user) {
         $userId = $this->retrieveUserId($user);
 
-        if($userId === $this->id) {
+        if($userId == $this->getKey()) {
             return false;
         }
 
