@@ -112,7 +112,7 @@ trait Friendable
      * @param int|self $user
      * @return bool
      */
-    public function sendFriendRequest($user)
+    public function sendFriendRequestTo($user)
     {
         $userId = $this->retrieveUserId($user);
 
@@ -159,7 +159,7 @@ trait Friendable
      * @param int|self $user
      * @return bool
      */
-    public function acceptFriendRequest($user)
+    public function acceptFriendRequestFrom($user)
     {
         $userId = $this->retrieveUserId($user);
 
@@ -185,7 +185,7 @@ trait Friendable
      * @param int|self $user
      * @return bool
      */
-    public function denyFriendRequest($user)
+    public function denyFriendRequestFrom($user)
     {
         $userId = $this->retrieveUserId($user);
 

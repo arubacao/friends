@@ -23,7 +23,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $bool = $sender->sendFriendRequest($recipient);
+        $bool = $sender->sendFriendRequestTo($recipient);
 
         $this->assertTrue($bool);
         $this->seeInDatabase('friends', [
@@ -48,7 +48,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
     public function a_user_can_not_send_a_user_a_friend_request_to_himself() {
         $sender = factory(User::class)->create();
 
-        $bool = $sender->sendFriendRequest($sender);
+        $bool = $sender->sendFriendRequestTo($sender);
 
         $this->assertFalse($bool);
         $this->dontSeeInDatabase('friends', [
@@ -67,10 +67,10 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $true = $sender->sendFriendRequest($recipient);
-        $false1 = $sender->sendFriendRequest($recipient);
-        $false2 = $sender->sendFriendRequest($recipient);
-        $false3 = $sender->sendFriendRequest($recipient);
+        $true = $sender->sendFriendRequestTo($recipient);
+        $false1 = $sender->sendFriendRequestTo($recipient);
+        $false2 = $sender->sendFriendRequestTo($recipient);
+        $false3 = $sender->sendFriendRequestTo($recipient);
 
 
         $this->assertTrue($true);
@@ -100,9 +100,9 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $true1 = $sender->sendFriendRequest($recipient);
-        $true2 = $recipient->acceptFriendRequest($sender);
-        $false = $sender->sendFriendRequest($recipient);
+        $true1 = $sender->sendFriendRequestTo($recipient);
+        $true2 = $recipient->acceptFriendRequestFrom($sender);
+        $false = $sender->sendFriendRequestTo($recipient);
 
         $this->assertTrue($true1);
         $this->assertTrue($true2);
@@ -132,9 +132,9 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $true1 = $sender->sendFriendRequest($recipient);
-        $true2 = $recipient->acceptFriendRequest($sender);
-        $false = $recipient->sendFriendRequest($sender);
+        $true1 = $sender->sendFriendRequestTo($recipient);
+        $true2 = $recipient->acceptFriendRequestFrom($sender);
+        $false = $recipient->sendFriendRequestTo($sender);
 
         $this->assertTrue($true1);
         $this->assertTrue($true2);
@@ -169,8 +169,8 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
-        $recipient->acceptFriendRequest($sender);
+        $sender->sendFriendRequestTo($recipient);
+        $recipient->acceptFriendRequestFrom($sender);
         $sender->deleteFriend($recipient);
 
         $this->dontSeeInDatabase('friends', [
@@ -189,8 +189,8 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
-        $recipient->acceptFriendRequest($sender);
+        $sender->sendFriendRequestTo($recipient);
+        $recipient->acceptFriendRequestFrom($sender);
 
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
@@ -214,8 +214,8 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
-        $recipient->acceptFriendRequest($sender);
+        $sender->sendFriendRequestTo($recipient);
+        $recipient->acceptFriendRequestFrom($sender);
 
         $this->assertTrue($sender->isFriendWith($recipient));
         $this->assertTrue($recipient->isFriendWith($sender));
@@ -228,8 +228,8 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
-        $recipient->denyFriendRequest($sender);
+        $sender->sendFriendRequestTo($recipient);
+        $recipient->denyFriendRequestFrom($sender);
 
         $this->dontSeeInDatabase('friends', [
             'sender_id' => $sender->id,
@@ -249,7 +249,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $bool = $recipient->acceptFriendRequest($sender);
+        $bool = $recipient->acceptFriendRequestFrom($sender);
 
         $this->assertFalse($bool);
         $this->dontSeeInDatabase('friends', [
@@ -274,8 +274,8 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
-        $recipient->sendFriendRequest($sender);
+        $sender->sendFriendRequestTo($recipient);
+        $recipient->sendFriendRequestTo($sender);
 
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
@@ -304,7 +304,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
+        $sender->sendFriendRequestTo($recipient);
 
         $this->assertCount(0, $sender->friends());
         $this->assertCount(0, $recipient->friends());
@@ -318,10 +318,10 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $recipient1 = factory(User::class)->create();
         $recipient2 = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient1);
-        $sender->sendFriendRequest($recipient2);
-        $recipient1->acceptFriendRequest($sender);
-        $recipient2->acceptFriendRequest($sender);
+        $sender->sendFriendRequestTo($recipient1);
+        $sender->sendFriendRequestTo($recipient2);
+        $recipient1->acceptFriendRequestFrom($sender);
+        $recipient2->acceptFriendRequestFrom($sender);
 
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
@@ -346,8 +346,8 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $recipients = factory(User::class)->times(50)->create();
 
         foreach ($recipients as $recipient) {
-            $sender->sendFriendRequest($recipient);
-            $recipient->acceptFriendRequest($sender);
+            $sender->sendFriendRequestTo($recipient);
+            $recipient->acceptFriendRequestFrom($sender);
             $this->assertCount(1, $recipient->friends());
         }
 
@@ -362,9 +362,9 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $recipients = factory(User::class)->times(50)->create();
 
         foreach ($recipients as $key => $recipient) {
-            $sender->sendFriendRequest($recipient);
+            $sender->sendFriendRequestTo($recipient);
             if ($key % 2) {
-                $recipient->acceptFriendRequest($sender);
+                $recipient->acceptFriendRequestFrom($sender);
                 $this->assertCount(1, $recipient->friends());
                 continue;
             }
@@ -382,10 +382,10 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $recipient0 = factory(User::class)->create();
         $recipient1 = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient0);
-        $sender->sendFriendRequest($recipient1);
-        $recipient0->acceptFriendRequest($sender);
-        $recipient1->acceptFriendRequest($sender);
+        $sender->sendFriendRequestTo($recipient0);
+        $sender->sendFriendRequestTo($recipient1);
+        $recipient0->acceptFriendRequestFrom($sender);
+        $recipient1->acceptFriendRequestFrom($sender);
 
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
@@ -409,7 +409,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
+        $sender->sendFriendRequestTo($recipient);
 
         $this->assertCount(1, $sender->any_friends());
         $this->assertCount(1, $recipient->any_friends());
@@ -423,9 +423,9 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $recipients = factory(User::class)->times(50)->create();
 
         foreach ($recipients as $key => $recipient) {
-            $sender->sendFriendRequest($recipient);
+            $sender->sendFriendRequestTo($recipient);
             if ($key % 2) {
-                $recipient->acceptFriendRequest($sender);
+                $recipient->acceptFriendRequestFrom($sender);
                 $this->assertCount(1, $recipient->any_friends());
                 continue;
             }
@@ -443,13 +443,13 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $recipients = factory(User::class)->times(50)->create();
 
         foreach ($recipients as $key => $recipient) {
-            $sender->sendFriendRequest($recipient);
+            $sender->sendFriendRequestTo($recipient);
             if ($key % 2) {
-                $recipient->acceptFriendRequest($sender);
+                $recipient->acceptFriendRequestFrom($sender);
                 $this->assertCount(1, $recipient->any_friends());
                 continue;
             }
-            $recipient->denyFriendRequest($sender);
+            $recipient->denyFriendRequestFrom($sender);
             $this->assertCount(0, $recipient->any_friends());
         }
 
@@ -463,7 +463,7 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $sender = factory(User::class)->create();
         $recipient = factory(User::class)->create();
 
-        $sender->sendFriendRequest($recipient);
+        $sender->sendFriendRequestTo($recipient);
 
         $this->assertCount(0, $sender->incoming_friends());
         $this->assertCount(1, $recipient->incoming_friends());
@@ -477,9 +477,9 @@ class FriendsTest extends \Arubacao\Tests\Friends\AbstractTestCase
         $senders = factory(User::class)->times(50)->create();
 
         foreach ($senders as $key => $sender) {
-            $sender->sendFriendRequest($recipient);
+            $sender->sendFriendRequestTo($recipient);
             if ($key % 2) {
-                $recipient->acceptFriendRequest($sender);
+                $recipient->acceptFriendRequestFrom($sender);
                 continue;
             }
         }
