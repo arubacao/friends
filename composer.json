@@ -37,8 +37,9 @@
         }
     },
     "autoload-dev": {
-        "psr-4": {
-            "Arubacao\\Friends\\Tests\\": "tests/"
-        }
+        "classmap": [
+            "tests/Models/User.php",
+            "tests/AbstractTestCase.php"
+        ]
     }
 }

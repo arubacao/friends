@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-class ExampleTest extends \Arubacao\Friends\Tests\AbstractTestCase
+class ExampleTest extends AbstractTestCase
 {
     /**
      * @test

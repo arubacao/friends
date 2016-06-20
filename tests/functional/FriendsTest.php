@@ -9,9 +9,8 @@
  */
 
 use Arubacao\Friends\Status;
-use Arubacao\Friends\Tests\Models\User;
 
-class FriendsTest extends \Arubacao\Friends\Tests\AbstractTestCase
+class FriendsTest extends AbstractTestCase
 {
     use \Illuminate\Foundation\Testing\DatabaseTransactions;
 //    use \Illuminate\Foundation\Testing\DatabaseMigrations;

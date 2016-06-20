@@ -8,10 +8,7 @@
  * file that was distributed with this source code.
  */
 
-use Arubacao\Friends\Status;
-use Arubacao\Tests\Friends\Models\User;
-
-class UnitTest extends \Arubacao\Friends\Tests\AbstractTestCase
+class UnitTest extends AbstractTestCase
 {
 
     /**

@@ -9,9 +9,8 @@
  */
 
 use Arubacao\Friends\Status;
-use Arubacao\Friends\Tests\Models\User;
 
-class UserQueryTest extends \Arubacao\Friends\Tests\AbstractTestCase
+class UserQueryTest extends AbstractTestCase
 {
 
     /**
