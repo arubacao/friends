@@ -4,9 +4,11 @@
 
 [![Build Status](https://img.shields.io/travis/arubacao/friends/master.svg?style=flat-square)](https://travis-ci.org/arubacao/friends)
 [![Latest Version](https://img.shields.io/packagist/v/arubacao/friends.svg?style=flat-square)](https://packagist.org/packages/arubacao/friends)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/9c0e986c-44e0-417d-bd8c-96ea170bcb50.svg?style=flat-square)](https://insight.sensiolabs.com/projects/9c0e986c-44e0-417d-bd8c-96ea170bcb50)
 [![Quality Score](https://img.shields.io/scrutinizer/g/arubacao/friends.svg?style=flat-square)](https://scrutinizer-ci.com/g/arubacao/friends)
+[![Code Coverage](https://scrutinizer-ci.com/g/arubacao/friends/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/arubacao/friends/?branch=master)
+[![codecov](https://codecov.io/gh/arubacao/friends/branch/master/graph/badge.svg?style=flat-square)](https://codecov.io/gh/arubacao/friends)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 ## Organise Friends and Relationships Between Users in Laravel and Lumen.
 #### Friends provides everything you need to easily implement your own Facebook like Friend System.
