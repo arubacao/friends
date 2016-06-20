@@ -1,27 +1,16 @@
-# Change Log Laravel Friendships
-All notable changes to the Laravel Friendships package will be documented in this file.
+# Change Log Friends
+All notable changes to the Friends package will be documented in this file.
 It adheres to [Semantic Versioning](http://semver.org/).
 `MAJOR.MINOR.PATCH`
 `Breaking.Feature.Bugfix`
 
-## 1.2.0 - x May 2016
+## 2.0.0 - 20 June 2016
+
 #### Added
-- Enable decoupling of database from application's internal structure (see MorphMap)
+- Rewrote package from scratch
 
-#### Changed
-- Return `FALSE` when recipient has blocked sender (`function befriend`)
-- Return `Friendship` when there is an existing Friendship (`function befriend`)
+#### Removed
+- Deleted complete sourcecode from Hootlex 
 
-## 1.1.0 - 13 May 2016
-#### Added
-- Style CI
-- php-cs-fixer
-- Changelog.md
-
-#### Changed
-- Reorganised Test Suite
-- Namespace
-
- 
 ## v1.0.15 - 2 May 2016
-#### Cloned Repo from Hootlex
+#### Forked repo from Hootlex

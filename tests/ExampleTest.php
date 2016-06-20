@@ -8,8 +8,13 @@
  * file that was distributed with this source code.
  */
 
-$factory->define(User::class, function (Faker\Generator $faker) {
-    return [
-        'name' => $faker->name,
-    ];
-});
+class ExampleTest extends AbstractTestCase
+{
+    /**
+     * @test
+     */
+    public function testStuff()
+    {
+        $this->assertTrue(true);
+    }
+}

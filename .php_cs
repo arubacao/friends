@@ -49,7 +49,6 @@ $fixers = [
     'phpdoc_indent',
     'phpdoc_inline_tag',
     'phpdoc_no_access',
-    'phpdoc_no_package',
     'phpdoc_scalar',
     'phpdoc_short_description',
     'phpdoc_to_comment',
