@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of Friends.
  *
@@ -9,6 +10,7 @@
  */
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Config;
 
 class CreateFriendsTable extends Migration
 {
@@ -23,12 +25,12 @@ class CreateFriendsTable extends Migration
             $table->unsignedInteger('sender_id')->index();
             $table->foreign('sender_id')
                 ->references('id')
-                ->on(\Config::get('friends.users_table'))
+                ->on(Config::get('friends.users_table'))
                 ->onDelete('cascade');
             $table->unsignedInteger('recipient_id')->index();
             $table->foreign('recipient_id')
                 ->references('id')
-                ->on(\Config::get('friends.users_table'))
+                ->on(Config::get('friends.users_table'))
                 ->onDelete('cascade');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();

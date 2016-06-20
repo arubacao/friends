@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of Friends.
  *
@@ -36,10 +37,12 @@ class FriendsServiceProvider extends ServiceProvider
      */
     protected function publishConfig()
     {
-        // Publish config files
-        $this->publishes([
-            __DIR__.'/../config/friends.php' => config_path('friends.php'),
-        ]);
+        if (function_exists('config_path')) {
+            // Publish config files
+            $this->publishes([
+                __DIR__.'/../config/friends.php' => config_path('friends.php'),
+            ]);
+        }
     }
 
     /**
@@ -68,6 +71,7 @@ class FriendsServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->configure('friends');
         $this->mergeConfig();
     }
 

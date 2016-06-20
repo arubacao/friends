@@ -4,6 +4,13 @@ It adheres to [Semantic Versioning](http://semver.org/).
 `MAJOR.MINOR.PATCH`
 `Breaking.Feature.Bugfix`
 
+## 2.0.1 - 21 June 2016
+#### Added
+- Lumen support
+
+#### Changed
+- Change Identical to Equal Comparison Operators 
+
 ## 2.0.0 - 20 June 2016
 
 #### Added
