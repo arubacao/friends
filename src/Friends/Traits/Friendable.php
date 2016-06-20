@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Arubacao\Friends\Traits;
 
 use Arubacao\Friends\Status;
@@ -306,8 +305,6 @@ trait Friendable
         if (! is_null($attempt2)) {
             return $attempt2;
         }
-
-        return;
     }
 
     /**
@@ -341,8 +338,8 @@ trait Friendable
         if (is_object($user)) {
             return $user->getKey();
         }
-        if (is_array($user) && isset($user[ 'id' ])) {
-            return $user[ 'id' ];
+        if (is_array($user) && isset($user['id'])) {
+            return $user['id'];
         }
 
         return $user;
