@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of Friends.
  *
@@ -10,6 +11,7 @@
 namespace Arubacao\Friends\Traits;
 
 use Arubacao\Friends\Status;
+use Illuminate\Support\Facades\Config;
 
 trait Friendable
 {
@@ -19,7 +21,7 @@ trait Friendable
     public function friends_i_am_sender()
     {
         return $this->belongsToMany(
-            self::class,
+            Config::get('friends.user_model'),
             'friends',
             'sender_id', 'recipient_id')
             ->withTimestamps()
@@ -35,7 +37,7 @@ trait Friendable
     public function friends_i_am_recipient()
     {
         return $this->belongsToMany(
-            self::class,
+            Config::get('friends.user_model'),
             'friends',
             'recipient_id', 'sender_id')
             ->withTimestamps()
@@ -124,7 +126,7 @@ trait Friendable
     /**
      * Alias to eloquent many-to-many relation's attach() method.
      *
-     * @param int|self $user
+     * @param int|User $user
      * @return bool
      */
     public function sendFriendRequestTo($user)
@@ -172,7 +174,7 @@ trait Friendable
     }
 
     /**
-     * @param int|self $user
+     * @param int|User $user
      * @return bool
      */
     public function acceptFriendRequestFrom($user)
@@ -199,7 +201,7 @@ trait Friendable
     }
 
     /**
-     * @param int|self $user
+     * @param int|User $user
      * @return bool
      */
     public function denyFriendRequestFrom($user)
@@ -225,7 +227,7 @@ trait Friendable
     }
 
     /**
-     * @param int|self $user
+     * @param int|User $user
      * @return bool
      */
     public function deleteFriend($user)
@@ -250,7 +252,7 @@ trait Friendable
     }
 
     /**
-     * @param int|array|self $user
+     * @param int|array|User $user
      * @return bool
      */
     public function isFriendWith($user)
@@ -261,7 +263,7 @@ trait Friendable
     }
 
     /**
-     * @param int|array|self $user
+     * @param int|array|User $user
      * @param array $status
      * @return bool
      */
@@ -275,7 +277,7 @@ trait Friendable
     }
 
     /**
-     * @param int|array|self $user
+     * @param int|array|User $user
      * @param array $status
      * @return mixed
      */
@@ -308,7 +310,7 @@ trait Friendable
     }
 
     /**
-     * @param int|array|self $user
+     * @param int|array|User $user
      * @return bool
      */
     public function hasPendingRequestFrom($user)
@@ -330,7 +332,7 @@ trait Friendable
     }
 
     /**
-     * @param int|array|self $user
+     * @param int|array|User $user
      * @return int|null
      */
     private function retrieveUserId($user)
@@ -366,7 +368,7 @@ trait Friendable
     }
 
     /**
-     * @param self $me
+     * @param User $me
      * @return \Illuminate\Database\Eloquent\Collection
      */
     private function mergedFriends($me)

@@ -35,7 +35,7 @@ abstract class AbstractTestCase extends AbstractPackageTestCase
     {
         parent::getEnvironmentSetUp($app);
         
-        $app['config']->set('friends.user_model', 'Arubacao\Tests\Friends\Models\User');
+        $app['config']->set('friends.user_model', User::class);
 
 //        \Schema::create('users', function ($table) {
 //            $table->increments('id');
