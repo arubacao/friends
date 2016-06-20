@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Arubacao\Tests\Friends\Models;
+namespace Arubacao\Friends\Tests\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable {

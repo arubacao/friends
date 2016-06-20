@@ -11,7 +11,7 @@
 use Arubacao\Friends\Status;
 use Arubacao\Tests\Friends\Models\User;
 
-class UnitTest extends \Arubacao\Tests\Friends\AbstractTestCase
+class UnitTest extends \Arubacao\Friends\Tests\AbstractTestCase
 {
 
     /**

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Arubacao\Tests\Friends;
+namespace Arubacao\Friends\Tests;
 
 use Arubacao\Friends\FriendsServiceProvider;
 use GrahamCampbell\TestBench\AbstractPackageTestCase;

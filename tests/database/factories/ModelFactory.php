@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-$factory->define(\Arubacao\Tests\Friends\Models\User::class, function (Faker\Generator $faker) {
+$factory->define(\Arubacao\Friends\Tests\Models\User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
     ];
