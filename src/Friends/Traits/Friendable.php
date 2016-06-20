@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of Friends.
  *
@@ -8,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Arubacao\Friends\Traits;
 
 use Arubacao\Friends\Status;
@@ -144,7 +144,7 @@ trait Friendable
         ]);
 
         if (! is_null($relationship)) {
-            if ($relationship->pivot->status === Status::ACCEPTED) {
+            if ($relationship->pivot->status == Status::ACCEPTED) {
                 // Already friends
                 return false;
             }
