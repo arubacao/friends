@@ -19,25 +19,25 @@
 
 ## Contents
 
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-    - [Friend Requests](#friend-requests)
-            - [Send Friend Request](#send-friend-request)
-            - [Accept Friend Request](#accept-friend-request)
-            - [Deny Friend Request](#deny-friend-request)
-    - [My Friends](#my-friends)
-            - [Is Friend With](#is-friend-with)
-            - [Delete Friend](#delete-friend)
-            - [Retrieve Friends](#retrieve-friends)
-            - [Retrieve Incoming Friends](#retrieve-incoming-friends)
-            - [Retrieve Any Friends](#retrieve-any-friends)
-    - [Relationships](#relationships)
-            - [Has Relationship With](#has-relationship-with)
-            - [Get Relationship With](#get-relationship-with)
-            - [Has Pending Request From](#has-pending-request-from)
-    - [Query Users Including Relationships](#query-users)
-- [License](#license)
+- [Installation](#installation)  
+- [Configuration](#configuration)  
+- [Usage](#usage)  
+    - [Friend Requests](#friend-requests)  
+            - [Send Friend Request](#send-friend-request)  
+            - [Accept Friend Request](#accept-friend-request)  
+            - [Deny Friend Request](#deny-friend-request)  
+    - [My Friends](#my-friends)  
+            - [Is Friend With](#is-friend-with)  
+            - [Delete Friend](#delete-friend)  
+            - [Retrieve Friends](#retrieve-friends)  
+            - [Retrieve Incoming Friends](#retrieve-incoming-friends)  
+            - [Retrieve Any Friends](#retrieve-any-friends)  
+    - [Relationships](#relationships)  
+            - [Has Relationship With](#has-relationship-with)  
+            - [Get Relationship With](#get-relationship-with)  
+            - [Has Pending Request From](#has-pending-request-from)  
+    - [Query Users Including Relationships](#query-users)  
+- [License](#license)  
 
 <a name="installation" />
 ## Installation
@@ -70,8 +70,8 @@ After the migration, 1 new table will be created:
 
 - `friends` &mdash; stores [relationships/friendships](http://laravel.com/docs/5.2/eloquent-relationships#many-to-many) between Users
 
-The `vendor:publish` command will also create a `friends.php` file in your config directory.
-The default configuration should work just fine for most applications.
+The `vendor:publish` command will also create a `friends.php` file in your config directory.  
+The default configuration should work just fine for most applications.  
 Otherwise check out [Configuration](#configuration).
 
 ### Prepare User Model
@@ -109,24 +109,24 @@ Find `friends.php` in your config folder. Make sure you published the package be
 ```php
 $user->sendFriendRequestTo($recipient);
 ```
-`$user` must be instance of `User`
-`$recipient` must be instance of `User`, `User` array or integer (User id)
+`$user` must be instance of `User`  
+`$recipient` must be instance of `User`, `User` array or integer (User id)  
 
 <a name="accept-friend-request" />
 #### Accept Friend Request
 ```php
 $user->acceptFriendRequestFrom($sender);
 ```
-`$user` must be instance of `User`
-`$sender` must be instance of `User`, `User` array or integer (User id)
+`$user` must be instance of `User`  
+`$sender` must be instance of `User`, `User` array or integer (User id)  
 
 <a name="deny-friend-request" />
 #### Deny Friend Request
 ```php
 $user->denyFriendRequestFrom($sender);
 ```
-`$user` must be instance of `User`
-`$sender` must be instance of `User`, `User` array or integer (User id)
+`$user` must be instance of `User`  
+`$sender` must be instance of `User`, `User` array or integer (User id)  
 
 <a name="my-friends" />
 ### My Friends
@@ -136,8 +136,8 @@ $user->denyFriendRequestFrom($sender);
 ```php
 $user->deleteFriend($douchebag);
 ```
-`$user` must be instance of `User`
-`$douchebag` must be instance of `User`, `User` array or integer (User id)
+`$user` must be instance of `User`  
+`$douchebag` must be instance of `User`, `User` array or integer (User id)  
 
 <a name="retrieve-friends" />
 #### Retrieve Friends
@@ -244,26 +244,26 @@ $friends = $user->any_friends();
 ```php
 $user->hasRelationshipWith($person, $status);
 ```
-`$user` must be instance of `User`
-`$person` must be instance of `User`, `User` array or integer (User id)
-`$status` must be array of integers (`Status`)
+`$user` must be instance of `User`  
+`$person` must be instance of `User`, `User` array or integer (User id)  
+`$status` must be array of integers (`Status`)  
 
 <a name="get-relationship-with" />
 #### Get Relationship With
 ```php
 $user->getRelationshipWith($person, $status);
 ```
-`$user` must be instance of `User`
-`$person` must be instance of `User`, `User` array or integer (User id)
-`$status` must be array of integers (`Status`)
+`$user` must be instance of `User`  
+`$person` must be instance of `User`, `User` array or integer (User id)  
+`$status` must be array of integers (`Status`)  
 
 <a name="has-pending-request-from" />
 #### Has Pending Request From
 ```php
 $user->hasPendingRequestFrom($person);
 ```
-`$user` must be instance of `User`
-`$person` must be instance of `User`, `User` array or integer (User id)
+`$user` must be instance of `User`  
+`$person` must be instance of `User`, `User` array or integer (User id)  
 
 <a name="query-users" />
 ### Query Users Including Relationships
