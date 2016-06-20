@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ This file is part of Laravel Friendships.
+  ~ This file is part of Friends.
   ~
   ~ (c) Christopher Lass <arubacao@gmail.com>
   ~
   ~ For the full copyright and license information, please view the LICENSE
   ~ file that was distributed with this source code.
-  ~
   -->
 
 <phpunit backupGlobals="false"
@@ -26,7 +25,7 @@
          verbose="true"
 >
     <testsuites>
-        <testsuite name="Laravel Friendships Test Suite">
+        <testsuite name="Friends Test Suite">
             <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
