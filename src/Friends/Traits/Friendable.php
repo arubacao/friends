@@ -56,13 +56,11 @@ trait Friendable
         return $query->with([
             'friends_i_am_sender' => function ($queryIn) use ($userId) {
                 $queryIn->where('recipient_id', $userId)
-                    ->get()
-                ;
+                    ->get();
             },
             'friends_i_am_recipient' => function ($queryIn) use ($userId) {
                 $queryIn->where('sender_id', $userId)
-                    ->get()
-                ;
+                    ->get();
             },
         ]);
     }
@@ -75,13 +73,11 @@ trait Friendable
         $me = $this->with([
             'friends_i_am_sender' => function ($query) {
                 $query->where('status', Status::ACCEPTED)
-                    ->get()
-                ;
+                    ->get();
             },
             'friends_i_am_recipient' => function ($query) {
                 $query->where('status', Status::ACCEPTED)
-                    ->get()
-                ;
+                    ->get();
             },
         ])
             ->where('id', '=', $this->getKey())
@@ -100,8 +96,7 @@ trait Friendable
         $me = $this->with([
             'friends_i_am_recipient' => function ($query) {
                 $query->where('status', Status::PENDING)
-                    ->get()
-                ;
+                    ->get();
             },
         ])
             ->where('id', '=', $this->getKey())
@@ -137,39 +132,40 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
-        if($userId == $this->getKey()) {
+        if ($userId == $this->getKey()) {
             // Method not allowed on self
             return false;
         }
 
         $relationship = $this->getRelationshipWith($userId, [
             Status::PENDING,
-            Status::ACCEPTED
+            Status::ACCEPTED,
         ]);
 
-        if(! is_null($relationship)){
+        if (! is_null($relationship)) {
             if ($relationship->pivot->status === Status::ACCEPTED) {
                 // Already friends
                 return false;
             }
             if ($relationship->pivot->status == Status::PENDING &&
-                $relationship->pivot->recipient_id == $this->getKey())
-            {
+                $relationship->pivot->recipient_id == $this->getKey()) {
                 // Recipient already sent a friend request
                 // Accept pending friend request
                 $relationship->pivot->status = Status::ACCEPTED;
                 $relationship->pivot->save();
-                /** @todo: fire event friend request accepted */
+                /* @todo: fire event friend request accepted */
                 $this->reload();
+
                 return true;
             }
+
             return false;
         }
-        
+
         $this->friends_i_am_sender()->attach($userId, [
             'status' => Status::PENDING,
         ]);
-        /** @todo: fire event friend request sent */
+        /* @todo: fire event friend request sent */
 
         $this->reload();
 
@@ -184,21 +180,22 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
-        if($userId == $this->getKey()) {
+        if ($userId == $this->getKey()) {
             // Method not allowed on self
             return false;
         }
 
         $relationship = $this->getPendingRequestFrom($userId);
 
-        if( ! is_null($relationship)) {
+        if (! is_null($relationship)) {
             $relationship->pivot->status = Status::ACCEPTED;
             $relationship->pivot->save();
-            /** @todo: fire event friend request accepted */
+            /* @todo: fire event friend request accepted */
             $this->reload();
 
             return true;
         }
+
         return false;
     }
 
@@ -210,20 +207,21 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
-        if($userId == $this->getKey()) {
+        if ($userId == $this->getKey()) {
             // Method not allowed on self
             return false;
         }
 
         $relationship = $this->getPendingRequestFrom($userId);
 
-        if( ! is_null($relationship)) {
+        if (! is_null($relationship)) {
             $relationship->pivot->delete();
-            /** @todo: fire event friend request denied */
+            /* @todo: fire event friend request denied */
             $this->reload();
 
             return true;
         }
+
         return false;
     }
 
@@ -231,22 +229,24 @@ trait Friendable
      * @param int|self $user
      * @return bool
      */
-    public function deleteFriend($user) {
+    public function deleteFriend($user)
+    {
         $userId = $this->retrieveUserId($user);
 
-        if($userId == $this->getKey()) {
+        if ($userId == $this->getKey()) {
             // Method not allowed on self
             return false;
         }
 
-        while($relationship = $this->getRelationshipWith($userId, [
+        while ($relationship = $this->getRelationshipWith($userId, [
             Status::ACCEPTED,
-            Status::PENDING
+            Status::PENDING,
         ])) {
             $relationship->pivot->delete();
-            /** @todo: fire event friend deleted */
+            /* @todo: fire event friend deleted */
         }
         $this->reload();
+
         return true;
     }
 
@@ -254,7 +254,8 @@ trait Friendable
      * @param int|array|self $user
      * @return bool
      */
-    public function isFriendWith($user) {
+    public function isFriendWith($user)
+    {
         $userId = $this->retrieveUserId($user);
 
         return $this->hasRelationshipWith($userId, [Status::ACCEPTED]);
@@ -265,13 +266,13 @@ trait Friendable
      * @param array $status
      * @return bool
      */
-    public function hasRelationshipWith($user, $status) {
+    public function hasRelationshipWith($user, $status)
+    {
         $userId = $this->retrieveUserId($user);
 
         $relationship = $this->getRelationshipWith($userId, $status);
 
         return (is_null($relationship)) ? false : true;
-
     }
 
     /**
@@ -279,12 +280,13 @@ trait Friendable
      * @param array $status
      * @return mixed
      */
-    public function getRelationshipWith($user, $status) {
+    public function getRelationshipWith($user, $status)
+    {
         $userId = $this->retrieveUserId($user);
 
-        if($userId == $this->getKey()) {
+        if ($userId == $this->getKey()) {
             // Method not allowed on self
-            return null;
+            return;
         }
 
         $attempt1 = $this->friends_i_am_recipient()
@@ -292,7 +294,7 @@ trait Friendable
             ->wherePivot('sender_id', $userId)
             ->first();
 
-        if ( ! is_null($attempt1) ){
+        if (! is_null($attempt1)) {
             return $attempt1;
         }
 
@@ -301,30 +303,32 @@ trait Friendable
             ->wherePivot('recipient_id', $userId)
             ->first();
 
-        if ( ! is_null($attempt2) ){
+        if (! is_null($attempt2)) {
             return $attempt2;
         }
 
-        return null;
+        return;
     }
 
     /**
      * @param int|array|self $user
      * @return bool
      */
-    public function hasPendingRequestFrom($user) {
+    public function hasPendingRequestFrom($user)
+    {
         $userId = $this->retrieveUserId($user);
 
-        if($userId == $this->getKey()) {
+        if ($userId == $this->getKey()) {
             // Method not allowed on self
             return false;
         }
 
         $relationship = $this->getPendingRequestFrom($userId);
 
-        if( ! is_null($relationship)) {
+        if (! is_null($relationship)) {
             return true;
         }
+
         return false;
     }
 
@@ -374,6 +378,7 @@ trait Friendable
         $friends->push($me->friends_i_am_sender);
         $friends->push($me->friends_i_am_recipient);
         $friends = $friends->flatten();
+
         return $friends;
     }
 }

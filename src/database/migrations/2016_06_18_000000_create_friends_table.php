@@ -13,7 +13,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateFriendsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,18 +20,18 @@ class CreateFriendsTable extends Migration
      */
     public function up()
     {
-        Schema::create( 'friends' , function (Blueprint $table) {
-            $table->unsignedInteger( 'sender_id' )->index();
-            $table->foreign( 'sender_id' )
-                ->references( 'id' )
-                ->on( \Config::get( 'friends.users_table' ) )
-                ->onDelete( 'cascade' );
-            $table->unsignedInteger( 'recipient_id' )->index();
-            $table->foreign( 'recipient_id' )
-                ->references( 'id' )
-                ->on( \Config::get( 'friends.users_table' ) )
-                ->onDelete( 'cascade' );
-            $table->tinyInteger( 'status' )->default(0);
+        Schema::create('friends', function (Blueprint $table) {
+            $table->unsignedInteger('sender_id')->index();
+            $table->foreign('sender_id')
+                ->references('id')
+                ->on(\Config::get('friends.users_table'))
+                ->onDelete('cascade');
+            $table->unsignedInteger('recipient_id')->index();
+            $table->foreign('recipient_id')
+                ->references('id')
+                ->on(\Config::get('friends.users_table'))
+                ->onDelete('cascade');
+            $table->tinyInteger('status')->default(0);
             $table->timestamps();
         });
     }

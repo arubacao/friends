@@ -33,18 +33,18 @@ class FriendsServiceProvider extends ServiceProvider
     }
 
     /**
-     * Publish Friends configuration
+     * Publish Friends configuration.
      */
     protected function publishConfig()
     {
         // Publish config files
-        $this->publishes( [
-            __DIR__ . '/../config/friends.php' => config_path( 'friends.php' ),
-        ] );
+        $this->publishes([
+            __DIR__.'/../config/friends.php' => config_path('friends.php'),
+        ]);
     }
 
     /**
-     * Publish Friends migration
+     * Publish Friends migration.
      */
     protected function publishMigration()
     {
@@ -52,15 +52,14 @@ class FriendsServiceProvider extends ServiceProvider
             return;
         }
 
-        $published_migration = glob( database_path( '/migrations/*_create_friends_table.php' ) );
-        if ( count( $published_migration ) != 0 )
-        {
+        $published_migration = glob(database_path('/migrations/*_create_friends_table.php'));
+        if (count($published_migration) != 0) {
             return;
         }
 
-        $stub = __DIR__ . '/../database/migrations/2016_06_18_000000_create_friends_table.php';
-        $target = database_path( '/migrations/' . date( 'Y_m_d_His' ) . '_create_friends_table.php' );
-        $this->publishes([ $stub => $target ], 'migrations' );
+        $stub = __DIR__.'/../database/migrations/2016_06_18_000000_create_friends_table.php';
+        $target = database_path('/migrations/'.date('Y_m_d_His').'_create_friends_table.php');
+        $this->publishes([$stub => $target], 'migrations');
     }
 
     /**
@@ -81,7 +80,7 @@ class FriendsServiceProvider extends ServiceProvider
     protected function mergeConfig()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/friends.php', 'friends'
+            __DIR__.'/../config/friends.php', 'friends'
         );
     }
 }
