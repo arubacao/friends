@@ -189,7 +189,7 @@ trait Friendable
             return false;
         }
 
-        $relationship = $this->getPendingRequest($userId);
+        $relationship = $this->getPendingRequestFrom($userId);
 
         if( ! is_null($relationship)) {
             $relationship->pivot->status = Status::ACCEPTED;
@@ -215,7 +215,7 @@ trait Friendable
             return false;
         }
 
-        $relationship = $this->getPendingRequest($userId);
+        $relationship = $this->getPendingRequestFrom($userId);
 
         if( ! is_null($relationship)) {
             $relationship->pivot->delete();
@@ -248,26 +248,6 @@ trait Friendable
         }
         $this->reload();
         return true;
-    }
-
-    /**
-     * @param int|array|self $user
-     * @return bool
-     */
-    public function hasPendingRequestFrom($user) {
-        $userId = $this->retrieveUserId($user);
-
-        if($userId == $this->getKey()) {
-            // Method not allowed on self
-            return false;
-        }
-
-        $relationship = $this->getPendingRequest($userId);
-
-        if( ! is_null($relationship)) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -330,6 +310,26 @@ trait Friendable
 
     /**
      * @param int|array|self $user
+     * @return bool
+     */
+    public function hasPendingRequestFrom($user) {
+        $userId = $this->retrieveUserId($user);
+
+        if($userId == $this->getKey()) {
+            // Method not allowed on self
+            return false;
+        }
+
+        $relationship = $this->getPendingRequestFrom($userId);
+
+        if( ! is_null($relationship)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param int|array|self $user
      * @return int|null
      */
     private function retrieveUserId($user)
@@ -348,7 +348,7 @@ trait Friendable
      * @param int $userId
      * @return mixed
      */
-    private function getPendingRequest($userId)
+    private function getPendingRequestFrom($userId)
     {
         return $this->friends_i_am_recipient()
             ->wherePivot('status', Status::PENDING)
