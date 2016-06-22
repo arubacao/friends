@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-use Arubacao\Friends\Status;
+use Arubacao\Friends\FriendshipStatus;
 
 class FriendsTest extends AbstractTestCase
 {
@@ -28,12 +28,12 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->dontSeeInDatabase('friends', [
             'recipient_id' => $sender->id,
             'sender_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->assertCount(1, $sender->any_friends());
         $this->assertCount(1, $recipient->any_friends());
@@ -79,12 +79,12 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->dontSeeInDatabase('friends', [
             'recipient_id' => $sender->id,
             'sender_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->assertCount(1, $sender->any_friends());
         $this->assertCount(1, $recipient->any_friends());
@@ -109,12 +109,12 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $this->dontSeeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->assertCount(1, $sender->any_friends());
         $this->assertCount(1, $sender->friends());
@@ -141,17 +141,17 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $this->dontSeeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->dontSeeInDatabase('friends', [
             'sender_id' => $recipient->id,
             'recipient_id' => $sender->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->assertCount(1, $sender->any_friends());
         $this->assertCount(1, $sender->friends());
@@ -194,12 +194,12 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $this->dontSeeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
 
         $this->assertCount(1, $sender->friends());
@@ -279,17 +279,17 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $this->dontSeeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         $this->dontSeeInDatabase('friends', [
             'sender_id' => $recipient->id,
             'recipient_id' => $sender->id,
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
 
         $this->assertCount(1, $sender->friends());
@@ -325,12 +325,12 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient1->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient2->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $this->assertCount(2, $sender->friends());
         $this->assertCount(1, $recipient1->friends());
@@ -389,12 +389,12 @@ class FriendsTest extends AbstractTestCase
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient0->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $this->seeInDatabase('friends', [
             'sender_id' => $sender->id,
             'recipient_id' => $recipient1->id,
-            'status' => Status::ACCEPTED,
+            'friendship_status' => FriendshipStatus::ACCEPTED,
         ]);
         $friends = $sender->friends();
         $this->assertEquals($recipient0->id, $friends[0]->id);

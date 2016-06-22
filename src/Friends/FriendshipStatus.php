@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of Friends.
  *
@@ -12,7 +13,7 @@ namespace Arubacao\Friends;
 /**
  * Class Status.
  */
-class Status
+class FriendshipStatus
 {
     const PENDING = 0;
     const ACCEPTED = 1;

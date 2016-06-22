@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of Friends.
  *
@@ -8,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Config;
@@ -32,7 +32,7 @@ class CreateFriendsTable extends Migration
                 ->references('id')
                 ->on(Config::get('friends.users_table'))
                 ->onDelete('cascade');
-            $table->tinyInteger('status')->default(0);
+            $table->tinyInteger('friendship_status')->default(0);
             $table->timestamps();
         });
     }

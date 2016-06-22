@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-use Arubacao\Friends\Status;
+use Arubacao\Friends\FriendshipStatus;
 
 class UserQueryTest extends AbstractTestCase
 {
@@ -45,28 +45,28 @@ class UserQueryTest extends AbstractTestCase
         $this->assertCount(0, $users_with_relationships[1]->friends_i_am_sender);
         $this->assertEquals($users[1]->id, $users_with_relationships[1]->friends_i_am_recipient->first()->pivot->recipient_id);
         $this->assertEquals($users[0]->id, $users_with_relationships[1]->friends_i_am_recipient->first()->pivot->sender_id);
-        $this->assertEquals(Status::ACCEPTED, $users_with_relationships[1]->friends_i_am_recipient->first()->pivot->status);
+        $this->assertEquals(FriendshipStatus::ACCEPTED, $users_with_relationships[1]->friends_i_am_recipient->first()->pivot->friendship_status);
 
         // User 2 : Friends with User 0 - Is Recipient
         $this->assertCount(1, $users_with_relationships[2]->friends_i_am_recipient);
         $this->assertCount(0, $users_with_relationships[2]->friends_i_am_sender);
         $this->assertEquals($users[2]->id, $users_with_relationships[2]->friends_i_am_recipient->first()->pivot->recipient_id);
         $this->assertEquals($users[0]->id, $users_with_relationships[2]->friends_i_am_recipient->first()->pivot->sender_id);
-        $this->assertEquals(Status::ACCEPTED, $users_with_relationships[2]->friends_i_am_recipient->first()->pivot->status);
+        $this->assertEquals(FriendshipStatus::ACCEPTED, $users_with_relationships[2]->friends_i_am_recipient->first()->pivot->friendship_status);
 
         // User 3 : Pending Request from User 0 - Is Recipient
         $this->assertCount(1, $users_with_relationships[3]->friends_i_am_recipient);
         $this->assertCount(0, $users_with_relationships[3]->friends_i_am_sender);
         $this->assertEquals($users[3]->id, $users_with_relationships[3]->friends_i_am_recipient->first()->pivot->recipient_id);
         $this->assertEquals($users[0]->id, $users_with_relationships[3]->friends_i_am_recipient->first()->pivot->sender_id);
-        $this->assertEquals(Status::PENDING, $users_with_relationships[3]->friends_i_am_recipient->first()->pivot->status);
+        $this->assertEquals(FriendshipStatus::PENDING, $users_with_relationships[3]->friends_i_am_recipient->first()->pivot->friendship_status);
 
         // User 4 : Pending Request for User 0 - Is Sender
         $this->assertCount(0, $users_with_relationships[4]->friends_i_am_recipient);
         $this->assertCount(1, $users_with_relationships[4]->friends_i_am_sender);
         $this->assertEquals($users[4]->id, $users_with_relationships[4]->friends_i_am_sender->first()->pivot->sender_id);
         $this->assertEquals($users[0]->id, $users_with_relationships[4]->friends_i_am_sender->first()->pivot->recipient_id);
-        $this->assertEquals(Status::PENDING, $users_with_relationships[4]->friends_i_am_sender->first()->pivot->status);
+        $this->assertEquals(FriendshipStatus::PENDING, $users_with_relationships[4]->friends_i_am_sender->first()->pivot->friendship_status);
     }
 
 

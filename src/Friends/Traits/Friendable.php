@@ -10,7 +10,7 @@
 
 namespace Arubacao\Friends\Traits;
 
-use Arubacao\Friends\Status;
+use Arubacao\Friends\FriendshipStatus;
 use Illuminate\Support\Facades\Config;
 
 trait Friendable
@@ -26,7 +26,7 @@ trait Friendable
             'sender_id', 'recipient_id')
             ->withTimestamps()
             ->withPivot([
-                'status',
+                'friendship_status',
             ])
             ->orderBy('updated_at', 'desc');
     }
@@ -42,7 +42,7 @@ trait Friendable
             'recipient_id', 'sender_id')
             ->withTimestamps()
             ->withPivot([
-                'status',
+                'friendship_status',
             ])
             ->orderBy('updated_at', 'desc');
     }
@@ -73,11 +73,11 @@ trait Friendable
     {
         $me = $this->with([
             'friends_i_am_sender' => function ($query) {
-                $query->where('status', Status::ACCEPTED)
+                $query->where('friendship_status', FriendshipStatus::ACCEPTED)
                     ->get();
             },
             'friends_i_am_recipient' => function ($query) {
-                $query->where('status', Status::ACCEPTED)
+                $query->where('friendship_status', FriendshipStatus::ACCEPTED)
                     ->get();
             },
         ])
@@ -96,7 +96,7 @@ trait Friendable
     {
         $me = $this->with([
             'friends_i_am_recipient' => function ($query) {
-                $query->where('status', Status::PENDING)
+                $query->where('friendship_status', FriendshipStatus::PENDING)
                     ->get();
             },
         ])
@@ -139,20 +139,20 @@ trait Friendable
         }
 
         $relationship = $this->getRelationshipWith($userId, [
-            Status::PENDING,
-            Status::ACCEPTED,
+            FriendshipStatus::PENDING,
+            FriendshipStatus::ACCEPTED,
         ]);
 
         if (! is_null($relationship)) {
-            if ($relationship->pivot->status == Status::ACCEPTED) {
+            if ($relationship->pivot->friendship_status == FriendshipStatus::ACCEPTED) {
                 // Already friends
                 return false;
             }
-            if ($relationship->pivot->status == Status::PENDING &&
+            if ($relationship->pivot->friendship_status == FriendshipStatus::PENDING &&
                 $relationship->pivot->recipient_id == $this->getKey()) {
                 // Recipient already sent a friend request
                 // Accept pending friend request
-                $relationship->pivot->status = Status::ACCEPTED;
+                $relationship->pivot->friendship_status = FriendshipStatus::ACCEPTED;
                 $relationship->pivot->save();
                 /* @todo: fire event friend request accepted */
                 $this->reload();
@@ -164,7 +164,7 @@ trait Friendable
         }
 
         $this->friends_i_am_sender()->attach($userId, [
-            'status' => Status::PENDING,
+            'friendship_status' => FriendshipStatus::PENDING,
         ]);
         /* @todo: fire event friend request sent */
 
@@ -189,7 +189,7 @@ trait Friendable
         $relationship = $this->getPendingRequestFrom($userId);
 
         if (! is_null($relationship)) {
-            $relationship->pivot->status = Status::ACCEPTED;
+            $relationship->pivot->friendship_status = FriendshipStatus::ACCEPTED;
             $relationship->pivot->save();
             /* @todo: fire event friend request accepted */
             $this->reload();
@@ -240,8 +240,8 @@ trait Friendable
         }
 
         while ($relationship = $this->getRelationshipWith($userId, [
-            Status::ACCEPTED,
-            Status::PENDING,
+            FriendshipStatus::ACCEPTED,
+            FriendshipStatus::PENDING,
         ])) {
             $relationship->pivot->delete();
             /* @todo: fire event friend deleted */
@@ -259,7 +259,7 @@ trait Friendable
     {
         $userId = $this->retrieveUserId($user);
 
-        return $this->hasRelationshipWith($userId, [Status::ACCEPTED]);
+        return $this->hasRelationshipWith($userId, [FriendshipStatus::ACCEPTED]);
     }
 
     /**
@@ -291,7 +291,7 @@ trait Friendable
         }
 
         $attempt1 = $this->friends_i_am_recipient()
-            ->wherePivotIn('status', $status)
+            ->wherePivotIn('friendship_status', $status)
             ->wherePivot('sender_id', $userId)
             ->first();
 
@@ -300,7 +300,7 @@ trait Friendable
         }
 
         $attempt2 = $this->friends_i_am_sender()
-            ->wherePivotIn('status', $status)
+            ->wherePivotIn('friendship_status', $status)
             ->wherePivot('recipient_id', $userId)
             ->first();
 
@@ -354,7 +354,7 @@ trait Friendable
     private function getPendingRequestFrom($userId)
     {
         return $this->friends_i_am_recipient()
-            ->wherePivot('status', Status::PENDING)
+            ->wherePivot('friendship_status', FriendshipStatus::PENDING)
             ->wherePivot('sender_id', $userId)
             ->first();
     }
