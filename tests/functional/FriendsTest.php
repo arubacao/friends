@@ -214,7 +214,7 @@ class FriendsTest extends AbstractTestCase
         $recipient = factory(User::class)->create();
 
         $sender->sendFriendRequestTo($recipient);
-        $recipient->acceptFriendRequestFrom($sender);
+        $recipient->sendFriendRequestTo($sender);
 
         $this->assertTrue($sender->isFriendWith($recipient));
         $this->assertTrue($recipient->isFriendWith($sender));
