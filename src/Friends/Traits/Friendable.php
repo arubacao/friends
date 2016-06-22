@@ -28,7 +28,7 @@ trait Friendable
             ->withPivot([
                 'friendship_status',
             ])
-            ->orderBy('updated_at', 'desc');
+            ->orderBy('friends.updated_at', 'desc');
     }
 
     /**
@@ -44,7 +44,7 @@ trait Friendable
             ->withPivot([
                 'friendship_status',
             ])
-            ->orderBy('updated_at', 'desc');
+            ->orderBy('friends.updated_at', 'desc');
     }
 
     /**
@@ -56,11 +56,11 @@ trait Friendable
 
         return $query->with([
             'friends_i_am_sender' => function ($queryIn) use ($userId) {
-                $queryIn->where('recipient_id', $userId)
+                $queryIn->where('friends.recipient_id', $userId)
                     ->get();
             },
             'friends_i_am_recipient' => function ($queryIn) use ($userId) {
-                $queryIn->where('sender_id', $userId)
+                $queryIn->where('friends.sender_id', $userId)
                     ->get();
             },
         ]);
@@ -73,11 +73,11 @@ trait Friendable
     {
         $me = $this->with([
             'friends_i_am_sender' => function ($query) {
-                $query->where('friendship_status', FriendshipStatus::ACCEPTED)
+                $query->where('friends.friendship_status', FriendshipStatus::ACCEPTED)
                     ->get();
             },
             'friends_i_am_recipient' => function ($query) {
-                $query->where('friendship_status', FriendshipStatus::ACCEPTED)
+                $query->where('friends.friendship_status', FriendshipStatus::ACCEPTED)
                     ->get();
             },
         ])
@@ -96,7 +96,7 @@ trait Friendable
     {
         $me = $this->with([
             'friends_i_am_recipient' => function ($query) {
-                $query->where('friendship_status', FriendshipStatus::PENDING)
+                $query->where('friends.friendship_status', FriendshipStatus::PENDING)
                     ->get();
             },
         ])
