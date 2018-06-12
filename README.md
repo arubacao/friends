@@ -1,4 +1,6 @@
-![friends-img](http://www.arubacao.com/friends.png)
+
+# Unmaintained
+This package is unmaintained and was only a quick hacking around. Don't use in production code. 
 
 # Friends (Laravel 5 Package)
 
